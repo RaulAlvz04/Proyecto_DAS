@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Proyecto_DAS">
         <activity
+            android:name=".ListaPeliculasActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
