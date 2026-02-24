@@ -24,13 +24,21 @@ public class Pelicula {
     @ColumnInfo(name = "sinopsis")
     public String sinopsis;
 
+    @ColumnInfo(name = "esFavorito")
+    public boolean esFavorito;
+
+    @ColumnInfo(name = "imagen")
+    public String imagen;
+
     // Constructor
-    public Pelicula(String titulo, String anno, String genero, float valoracion, String sinopsis) {
+    public Pelicula(String titulo, String anno, String genero, float valoracion, String sinopsis, boolean esFavorito, String imagen ) {
         this.titulo = titulo;
         this.anno = anno;
         this.genero = genero;
         this.valoracion = valoracion;
         this.sinopsis = sinopsis;
+        this.esFavorito = esFavorito;
+        this.imagen = imagen;
     }
 
     // Getters
@@ -58,6 +66,10 @@ public class Pelicula {
         return titulo;
     }
 
+    public boolean isEsFavorito() {return esFavorito;}
+
+    public String getImagen(String imagen) {return imagen;}
+
     // Setters
     public void setAnno(String anno) {
         this.anno = anno;
@@ -82,4 +94,8 @@ public class Pelicula {
     public void setValoracion(float valoracion) {
         this.valoracion = valoracion;
     }
+
+    public void setEsFavorito(boolean esFavorito) {this.esFavorito = esFavorito;}
+
+    public void setImagen(String imagen) {this.imagen = imagen;}
 }

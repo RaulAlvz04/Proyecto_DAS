@@ -24,4 +24,7 @@ public interface PeliculaDAO {
 
     @Query("SELECT * FROM peliculas WHERE genero = :genero")
     List<Pelicula> findByGenero(String genero);
+
+    @Query("SELECT * FROM peliculas WHERE esFavorito = 1 ")
+    List<Pelicula> getFavoritas();
 }
