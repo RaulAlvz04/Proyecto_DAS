@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,10 +19,11 @@ import androidx.room.Room;
 import com.example.proyecto_das.db.AppDatabase;
 import com.example.proyecto_das.db.Pelicula;
 import com.example.proyecto_das.db.PeliculaDAO;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
-public class ListaPeliculasActivity extends AppCompatActivity implements DialogAnnadirPeli.ListenerDAP {
+public class ListaPeliculasActivity extends AppCompatActivity implements DialogAnnadirPeli.ListenerDAP, DialogBorrarPeli.ListenerDBP {
 
     private PeliculaAdapter adapter;
     private List<Pelicula> lista;
@@ -54,7 +56,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
         adapter = new PeliculaAdapter(lista);
         rv.setAdapter(adapter);
 
-        Button btnAnnadir = findViewById(R.id.btnPruebaAdd);
+        FloatingActionButton btnAnnadir = findViewById(R.id.btnAdd);
         btnAnnadir.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -77,5 +79,18 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
         adapter.notifyDataSetChanged();
 
 
+    }
+
+    @Override
+    public void alConfirmarBorrado(int posicion) {
+
+        Pelicula peliABorrar = lista.get(posicion);
+
+        peliDao.delete(peliABorrar);
+
+        lista.remove(posicion);
+        adapter.notifyItemRemoved(posicion);
+
+        Toast.makeText(this, "Película eliminada", Toast.LENGTH_SHORT).show();
     }
 }

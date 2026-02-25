@@ -6,6 +6,9 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class PeliculaViewHolder extends RecyclerView.ViewHolder {
@@ -23,5 +26,20 @@ public class PeliculaViewHolder extends RecyclerView.ViewHolder {
         valoracion = itemView.findViewById(R.id.ratingPeli);
         imagen = itemView.findViewById(R.id.imgPortada);
         favorito = itemView.findViewById(R.id.imgFavorito);
+
+        itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                int posicion = getAdapterPosition();
+
+                if (v.getContext() instanceof AppCompatActivity) {
+                    FragmentManager fragmentManager = ((AppCompatActivity) v.getContext()).getSupportFragmentManager();
+                    DialogBorrarPeli dialogo = new DialogBorrarPeli(posicion);
+                    dialogo.show(fragmentManager, "tag_borrar");
+                }
+
+                return true;
+            }
+        });
     }
 }
