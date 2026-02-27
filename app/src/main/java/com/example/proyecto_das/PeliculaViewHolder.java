@@ -41,5 +41,17 @@ public class PeliculaViewHolder extends RecyclerView.ViewHolder {
                 return true;
             }
         });
+
+        favorito.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int posicion = getAdapterPosition();
+
+                if (v.getContext() instanceof ListaPeliculasActivity) {
+                    ListaPeliculasActivity activity = (ListaPeliculasActivity) v.getContext();
+                    activity.ponerFavorito(posicion);
+                }
+            }
+        });
     }
 }

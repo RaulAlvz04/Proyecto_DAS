@@ -93,4 +93,15 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
 
         Toast.makeText(this, "Película eliminada", Toast.LENGTH_SHORT).show();
     }
+
+    public void ponerFavorito(int posicion) {
+
+        Pelicula peli = lista.get(posicion);
+
+        peli.setEsFavorito(!peli.esFavorito);
+
+        peliDao.update(peli);
+
+        adapter.notifyItemChanged(posicion);
+    }
 }
