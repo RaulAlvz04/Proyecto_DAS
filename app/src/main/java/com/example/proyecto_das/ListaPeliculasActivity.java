@@ -29,6 +29,8 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
     private List<Pelicula> lista;
     private PeliculaDAO peliDao;
 
+    private int idUsuarioLogueado;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,22 +38,18 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_lista_peliculas);
 
+        idUsuarioLogueado = getIntent().getIntExtra("ID_USUARIO", -1);
+
         RecyclerView rv = findViewById(R.id.miRecyView);
         rv.setLayoutManager(new LinearLayoutManager(this));
 
         AppDatabase db = Room.databaseBuilder(getApplicationContext(),
                         AppDatabase.class, "cine-db")
-                .allowMainThreadQueries() // Importante para que no te de error de hilos hoy
+                .allowMainThreadQueries()
                 .build();
 
         peliDao = db.peliculaDao();
-        lista = peliDao.getAll();
-
-        if (lista.isEmpty()) {
-            Pelicula prueba = new Pelicula("Batman", "2022", "Acción", 4.5f, "Sinopsis...", false, null);
-            peliDao.insert(prueba);
-            lista = peliDao.getAll(); // Volvemos a cargar la lista
-        }
+        lista = peliDao.getPelisPorUsuario(idUsuarioLogueado);
 
         adapter = new PeliculaAdapter(lista);
         rv.setAdapter(adapter);
@@ -70,14 +68,12 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
     @Override
     public void alPulsarAnnadir(String titulo, String genero, String anno, float valoracion) {
 
-        Pelicula nuevaPeli = new Pelicula(titulo,anno,genero,valoracion,"Sinopsis...", false, null);
+        Pelicula nuevaPeli = new Pelicula(titulo,anno,genero,valoracion,"Sinopsis...", false, null, true, idUsuarioLogueado);
         peliDao.insert(nuevaPeli);
 
         lista.clear();
-        lista.addAll(peliDao.getAll());
-
+        lista.addAll(peliDao.getPelisPorUsuario(idUsuarioLogueado));
         adapter.notifyDataSetChanged();
-
 
     }
 

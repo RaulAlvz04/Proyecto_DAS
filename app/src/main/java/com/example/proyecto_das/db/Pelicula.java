@@ -21,8 +21,8 @@ public class Pelicula {
     @ColumnInfo(name = "valoracion")
     public float valoracion;
 
-    @ColumnInfo(name = "sinopsis")
-    public String sinopsis;
+    @ColumnInfo(name = "opinion")
+    public String opinion;
 
     @ColumnInfo(name = "esFavorito")
     public boolean esFavorito;
@@ -30,15 +30,23 @@ public class Pelicula {
     @ColumnInfo(name = "imagen")
     public String imagen;
 
+    @ColumnInfo(name = "esPendiente")
+    public boolean esPendiente;
+
+    @ColumnInfo(name = "idUsuario")
+    public int idUsuario;
+
     // Constructor
-    public Pelicula(String titulo, String anno, String genero, float valoracion, String sinopsis, boolean esFavorito, String imagen ) {
+    public Pelicula(String titulo, String anno, String genero, float valoracion, String opinion, boolean esFavorito, String imagen, boolean esPendiente, int idUsuario ) {
         this.titulo = titulo;
         this.anno = anno;
         this.genero = genero;
         this.valoracion = valoracion;
-        this.sinopsis = sinopsis;
+        this.opinion = opinion;
         this.esFavorito = esFavorito;
         this.imagen = imagen;
+        this.esPendiente = esPendiente;
+        this.idUsuario = idUsuario;
     }
 
     // Getters
@@ -58,8 +66,8 @@ public class Pelicula {
         return genero;
     }
 
-    public String getSinopsis() {
-        return sinopsis;
+    public String getOpinion() {
+        return opinion;
     }
 
     public String getTitulo() {
@@ -69,6 +77,10 @@ public class Pelicula {
     public boolean isEsFavorito() {return esFavorito;}
 
     public String getImagen(String imagen) {return imagen;}
+
+    public boolean isEsPendiente() {return esPendiente;}
+
+    public int getIdUsuario() {return idUsuario;}
 
     // Setters
     public void setAnno(String anno) {
@@ -83,8 +95,8 @@ public class Pelicula {
         this.id = id;
     }
 
-    public void setSinopsis(String sinopsis) {
-        this.sinopsis = sinopsis;
+    public void setOpinion(String opinion) {
+        this.opinion = opinion;
     }
 
     public void setTitulo(String titulo) {
@@ -98,4 +110,8 @@ public class Pelicula {
     public void setEsFavorito(boolean esFavorito) {this.esFavorito = esFavorito;}
 
     public void setImagen(String imagen) {this.imagen = imagen;}
+
+    public void setEsPendiente(boolean esPendiente) {this.esPendiente = esPendiente;}
+
+    public void setIdUsuario(int idUsuario) {this.idUsuario = idUsuario;}
 }

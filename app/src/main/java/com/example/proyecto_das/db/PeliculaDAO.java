@@ -27,4 +27,10 @@ public interface PeliculaDAO {
 
     @Query("SELECT * FROM peliculas WHERE esFavorito = 1 ")
     List<Pelicula> getFavoritas();
+
+    @Query("SELECT * FROM peliculas WHERE idUsuario = :idUsuario")
+    List<Pelicula> getPelisPorUsuario(int idUsuario);
+
+    @Query("SELECT * FROM peliculas WHERE esPendiente = 1 ")
+    List<Pelicula> getPendientes();
 }
