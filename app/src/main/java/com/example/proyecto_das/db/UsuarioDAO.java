@@ -24,4 +24,7 @@ public interface UsuarioDAO {
 
     @Query("SELECT * FROM usuarios WHERE email = :email AND password = :pass LIMIT 1")
     Usuario login(String email, String pass);
+
+    @Query("SELECT * FROM usuarios WHERE email = :email LIMIT 1")
+    Usuario buscarPorEmail(String email);
 }

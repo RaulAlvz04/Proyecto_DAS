@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
         etEmail = findViewById(R.id.emailText);
         etPassword = findViewById(R.id.passText);
         Button btnEntrar = findViewById(R.id.botonAcceso);
+        Button btnRegistro = findViewById(R.id.btnRegistrarse);
         btnEntrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -58,6 +59,14 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     }
                 }
+            }
+        });
+
+        btnRegistro.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, RegistroActivity.class);
+                startActivity(intent);
             }
         });
     }
