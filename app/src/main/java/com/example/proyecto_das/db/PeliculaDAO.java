@@ -33,4 +33,7 @@ public interface PeliculaDAO {
 
     @Query("SELECT * FROM peliculas WHERE esPendiente = 1 ")
     List<Pelicula> getPendientes();
+
+    @Query("SELECT * FROM peliculas WHERE id = :idPeli")
+    Pelicula getPeliPorId(int idPeli);
 }

@@ -1,5 +1,11 @@
 package com.example.proyecto_das;
 
+import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -8,6 +14,9 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -55,10 +64,34 @@ public class RegistroActivity extends AppCompatActivity {
                 else {
                     Usuario nuevoUsuario = new Usuario(pass,email);
                     db.usuarioDAO().insert(nuevoUsuario);
+
+                    enviarNotificacion();
+
                     Toast.makeText(RegistroActivity.this, "Usuario creado", Toast.LENGTH_SHORT).show();
                     finish();
                 }
             }
         });
+    }
+
+    private void enviarNotificacion() {
+
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "Canal01");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel canal = new NotificationChannel("Canal01", "CanalBienvenida",
+                    NotificationManager.IMPORTANCE_DEFAULT);
+
+            manager.createNotificationChannel(canal);
+        }
+
+        builder.setSmallIcon(android.R.drawable.stat_sys_warning)
+                .setContentTitle("¡Bienvenido/a!")
+                .setContentText("Te has registrado correctamente. Disfruta de la aplicación.")
+                .setVibrate(new long[]{0, 1000, 500, 1000})
+                .setAutoCancel(true);
+
+        manager.notify(1, builder.build());
+
     }
 }

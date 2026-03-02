@@ -76,7 +76,7 @@ public class Pelicula {
 
     public boolean isEsFavorito() {return esFavorito;}
 
-    public String getImagen(String imagen) {return imagen;}
+    public String getImagen() {return imagen;}
 
     public boolean isEsPendiente() {return esPendiente;}
 

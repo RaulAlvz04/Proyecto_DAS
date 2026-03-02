@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.proyecto_das.db.Pelicula;
 
+import java.io.File;
 import java.util.List;
 
 public class PeliculaAdapter extends RecyclerView.Adapter<PeliculaViewHolder> {
@@ -33,11 +34,16 @@ public class PeliculaAdapter extends RecyclerView.Adapter<PeliculaViewHolder> {
         holder.titulo.setText(peli.titulo);
         holder.valoracion.setRating(peli.valoracion);
         holder.genero.setText(peli.genero);
+        holder.idPeliculaActual = peli.getId();
 
-        if (peli.imagen !=null && !peli.imagen.isEmpty()){
-            holder.imagen.setImageURI(Uri.parse(peli.imagen));
-        } else {
-            holder.imagen.setImageResource(android.R.drawable.ic_menu_gallery);
+        if (peli.getImagen() != null && !peli.getImagen().isEmpty()) {
+            File imagen = new File(peli.getImagen());
+            if (imagen.exists()) {
+                holder.imagen.setImageURI(Uri.fromFile(imagen));
+            } else {
+                // Si el archivo no existe, ponemos uno por defecto
+                holder.imagen.setImageResource(R.drawable.ic_launcher_background);
+            }
         }
 
         if (peli.esFavorito) {

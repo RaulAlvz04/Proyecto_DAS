@@ -100,4 +100,17 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
 
         adapter.notifyItemChanged(posicion);
     }
+
+    protected void onResume() {
+        super.onResume();
+
+        List <Pelicula> listaActualizada = peliDao.getPelisPorUsuario(idUsuarioLogueado);
+
+        lista.clear();
+        lista.addAll(listaActualizada);
+
+        adapter.notifyDataSetChanged();
+
+
+    }
 }

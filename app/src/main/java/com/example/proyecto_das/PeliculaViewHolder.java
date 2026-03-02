@@ -1,5 +1,6 @@
 package com.example.proyecto_das;
 
+import android.content.Intent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RatingBar;
@@ -11,6 +12,8 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.File;
+
 public class PeliculaViewHolder extends RecyclerView.ViewHolder {
     public TextView titulo;
     public TextView genero;
@@ -18,6 +21,8 @@ public class PeliculaViewHolder extends RecyclerView.ViewHolder {
     public ImageView imagen;
 
     public ImageView favorito;
+
+    public int idPeliculaActual;
 
     public PeliculaViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -51,6 +56,15 @@ public class PeliculaViewHolder extends RecyclerView.ViewHolder {
                     ListaPeliculasActivity activity = (ListaPeliculasActivity) v.getContext();
                     activity.ponerFavorito(posicion);
                 }
+            }
+        });
+
+        itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), DetallePeliculaActivity.class);
+                intent.putExtra("ID_PELICULA", idPeliculaActual);
+                v.getContext().startActivity(intent);
             }
         });
     }
