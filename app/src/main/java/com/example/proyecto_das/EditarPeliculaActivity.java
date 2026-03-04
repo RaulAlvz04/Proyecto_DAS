@@ -159,7 +159,7 @@ public class EditarPeliculaActivity extends AppCompatActivity {
         if (requestCode == 100 && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             abrirGaleria();
         } else {
-            Toast.makeText(this, "Permiso denegado", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.msg_permiso_denegado), Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -35,8 +35,8 @@ public class DialogAnnadirPeli extends DialogFragment {
         RatingBar etValoracion = vista.findViewById(R.id.rbValoracion);
 
         builder.setView(vista).
-                setTitle("Introduce los datos de la pelicula").
-                setPositiveButton("Añadir", new DialogInterface.OnClickListener() {
+                setTitle(getString(R.string.titulo_annadir)).
+                setPositiveButton(getString(R.string.btn_annadir), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         String titulo = etTitulo.getText().toString();
@@ -47,7 +47,7 @@ public class DialogAnnadirPeli extends DialogFragment {
                         miListener.alPulsarAnnadir(titulo,genero,anno,valoracion);
                     }
                 }).
-                setNegativeButton("Cancelar", (dialog,id) -> dialog.dismiss());
+                setNegativeButton(getString(R.string.btn_cancelarAnnadir), (dialog,id) -> dialog.dismiss());
 
         return builder.create();
     }

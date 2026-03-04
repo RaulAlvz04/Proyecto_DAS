@@ -31,14 +31,14 @@ public class DialogBorrarPeli extends DialogFragment {
         super.onCreateDialog(savedInstanceState);
         miListener = (ListenerDBP) getActivity();
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("¿Eliminar película?");
-        builder.setMessage("Esta acción no se puede deshacer.");
+        builder.setTitle(getString(R.string.titulo_borrar));
+        builder.setMessage(getString(R.string.msg_borrar));
 
-        builder.setPositiveButton("Eliminar", (dialog, id) -> {
+        builder.setPositiveButton(getString(R.string.btn_eliminar), (dialog, id) -> {
             miListener.alConfirmarBorrado(posicion);
         });
 
-        builder.setNegativeButton("Cancelar", (dialog, id) -> dialog.dismiss());
+        builder.setNegativeButton(getString(R.string.btn_cancelar), (dialog, id) -> dialog.dismiss());
 
         return builder.create();
     }

@@ -1,5 +1,45 @@
 <resources>
     <string name="app_name">Proyecto_DAS</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="g_nero_drama">Género: Drama</string>
+    <string name="mi_opini_n">Mi Opinión:</string>
+    <string name="opinionTexto">Aquí va la opinión completa que escribió el usuario al registrar la película.</string>
+    <string name="editar_pel_cula">Editar Película</string>
+    <string name="compartir_opini_n">Compartir opinión</string>
+    <string name="modificar_pel_cula">Modificar Película</string>
+    <string name="toca_para_cambiar_imagen">Toca para cambiar imagen</string>
+    <string name="t_tulo_de_la_pel_cula">Título de la película</string>
+    <string name="g_nero_ej_terror_comedia">Género (Ej: Terror, Comedia...)</string>
+    <string name="tu_valoraci_n">Tu valoración:</string>
+    <string name="opini_n_cr_tica">Opinión / Crítica:</string>
+    <string name="escribe_aqu_qu_te_ha_parecido">Escribe aquí qué te ha parecido...</string>
+    <string name="guardar_cambios">GUARDAR CAMBIOS</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="a_adir_pel_cula">Añadir película</string>
+    <string name="acceder">Acceder</string>
+    <string name="introduce_un_email">Introduce un email</string>
+    <string name="introduce_una_contrase_a">Introduce una contraseña</string>
+    <string name="registrate">Registrate</string>
+    <string name="registrar">Registrar</string>
+    <string name="introContra">Introduce una contraseña</string>
+    <string name="introEmail">Introduce un email</string>
+    <string name="annadir_pel_cula">Añadir Película</string>
+    <string name="t_tulo">Título</string>
+    <string name="a_o">Año</string>
+    <string name="g_nero">Género</string>
+    <string name="valoraci_n">Valoración:</string>
+    <string name="tituloItem">Título</string>
+    <string name="generoItem">Género</string>
+    <string name="favorito">Favorito</string>
+    <string name="titulo_borrar">¿Eliminar película?</string>
+    <string name="msg_borrar">Esta acción no se puede deshacer.</string>
+    <string name="btn_eliminar">Eliminar</string>
+    <string name="btn_cancelar">Cancelar</string>
+    <string name="msg_compartir_1">He visto esta película: </string>
+    <string name="msg_compartir_2">\nEsto es lo que opino de ella: </string>
+    <string name="titulo_chooser">Compartir peli con...</string>
+    <string name="titulo_annadir">Introduce los datos de la película</string>
+    <string name="btn_annadir">Añadir</string>
+    <string name="btn_cancelarAnnadir">Cancelar</string>
+    <string name="msg_permiso_denegado">Permiso denegado</string>
+    <string name="msg_peli_borrada">Película eliminada</string>
 </resources>

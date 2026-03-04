@@ -63,8 +63,8 @@ public class DetallePeliculaActivity extends AppCompatActivity {
         btnCompartir.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String mensaje = "He visto esta película: " + tvTitulo.getText().toString() +
-                        "\nEsto es lo que opino de ella: " + tvOpinion.getText().toString();
+                String mensaje = getString(R.string.msg_compartir_1) + tvTitulo.getText().toString() +
+                        getString(R.string.msg_compartir_2) + tvOpinion.getText().toString();
 
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
@@ -72,7 +72,7 @@ public class DetallePeliculaActivity extends AppCompatActivity {
                 sendIntent.setType("text/plain");
 
                 // Esto muestra el selector de aplicaciones del sistema
-                Intent shareIntent = Intent.createChooser(sendIntent, "Compartir peli con...");
+                Intent shareIntent = Intent.createChooser(sendIntent, getString(R.string.titulo_chooser));
                 startActivity(shareIntent);
             }
         });

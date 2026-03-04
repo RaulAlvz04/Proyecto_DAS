@@ -25,14 +25,14 @@ public interface PeliculaDAO {
     @Query("SELECT * FROM peliculas WHERE genero = :genero")
     List<Pelicula> findByGenero(String genero);
 
-    @Query("SELECT * FROM peliculas WHERE esFavorito = 1 ")
-    List<Pelicula> getFavoritas();
+    @Query("SELECT * FROM peliculas WHERE idUsuario =:idUsuario AND esFavorito = 1 ")
+    List<Pelicula> getFavoritosUsuario(int idUsuario);
 
     @Query("SELECT * FROM peliculas WHERE idUsuario = :idUsuario")
     List<Pelicula> getPelisPorUsuario(int idUsuario);
 
-    @Query("SELECT * FROM peliculas WHERE esPendiente = 1 ")
-    List<Pelicula> getPendientes();
+    @Query("SELECT * FROM peliculas WHERE idUsuario =:idUsuario AND esPendiente = 1 ")
+    List<Pelicula> getPendientesUsuario(int idUsuario);
 
     @Query("SELECT * FROM peliculas WHERE id = :idPeli")
     Pelicula getPeliPorId(int idPeli);
