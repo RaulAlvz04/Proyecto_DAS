@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RatingBar;
 
@@ -17,7 +18,7 @@ public class DialogAnnadirPeli extends DialogFragment {
     ListenerDAP miListener;
 
     public interface ListenerDAP {
-        void alPulsarAnnadir(String titulo, String genero, String anno, float valoracion);
+        void alPulsarAnnadir(String titulo, String genero, String anno, float valoracion, boolean esPendiente);
     }
 
     @NonNull
@@ -33,6 +34,7 @@ public class DialogAnnadirPeli extends DialogFragment {
         EditText etAnno = vista.findViewById(R.id.etAnno);
         EditText etGenero = vista.findViewById(R.id.etGenero);
         RatingBar etValoracion = vista.findViewById(R.id.rbValoracion);
+        CheckBox cbEsPendiente = vista.findViewById(R.id.cbPendiente);
 
         builder.setView(vista).
                 setTitle(getString(R.string.titulo_annadir)).
@@ -43,8 +45,9 @@ public class DialogAnnadirPeli extends DialogFragment {
                         String anno = etAnno.getText().toString();
                         String genero = etGenero.getText().toString();
                         float valoracion = etValoracion.getRating();
+                        boolean esPendiente = cbEsPendiente.isChecked();
 
-                        miListener.alPulsarAnnadir(titulo,genero,anno,valoracion);
+                        miListener.alPulsarAnnadir(titulo,genero,anno,valoracion,esPendiente);
                     }
                 }).
                 setNegativeButton(getString(R.string.btn_cancelarAnnadir), (dialog,id) -> dialog.dismiss());

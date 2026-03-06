@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RatingBar;
@@ -44,6 +45,7 @@ public class EditarPeliculaActivity extends AppCompatActivity {
     ImageView imagenPeli;
     RatingBar rbValoracion;
     Button btnGuardar, btnCancelar;
+    CheckBox cbPendiente;
     AppDatabase db;
     Pelicula peliculaActual;
     int idPeli;
@@ -82,6 +84,7 @@ public class EditarPeliculaActivity extends AppCompatActivity {
         btnCancelar = findViewById(R.id.btnCancelar);
         tvCambiarImagen = findViewById(R.id.tvCambiarImagen);
         imagenPeli = findViewById(R.id.imgPeli);
+        cbPendiente = findViewById(R.id.checkEditarPendiente);
 
         idPeli = getIntent().getIntExtra("ID_PELICULA", -1);
 
@@ -91,6 +94,7 @@ public class EditarPeliculaActivity extends AppCompatActivity {
             etGenero.setText(peliculaActual.getGenero());
             etOpinion.setText(peliculaActual.getOpinion());
             rbValoracion.setRating(peliculaActual.getValoracion());
+            cbPendiente.setChecked(peliculaActual.isEsPendiente());
 
             if (peliculaActual.getImagen() != null && !peliculaActual.getImagen().isEmpty()) {
                 File imagen = new File(peliculaActual.getImagen());
@@ -114,6 +118,7 @@ public class EditarPeliculaActivity extends AppCompatActivity {
                 peliculaActual.setGenero(etGenero.getText().toString());
                 peliculaActual.setOpinion(etOpinion.getText().toString());
                 peliculaActual.setValoracion((int) rbValoracion.getRating());
+                peliculaActual.setEsPendiente(cbPendiente.isChecked());
 
                 db.peliculaDao().update(peliculaActual);
                 finish();

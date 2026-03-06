@@ -36,6 +36,12 @@ public class PeliculaAdapter extends RecyclerView.Adapter<PeliculaViewHolder> {
         holder.genero.setText(peli.genero);
         holder.idPeliculaActual = peli.getId();
 
+        if (peli.isEsPendiente()) {
+            holder.pendiente.setVisibility(View.VISIBLE);
+        } else {
+            holder.pendiente.setVisibility(View.GONE);
+        }
+
         if (peli.getImagen() != null && !peli.getImagen().isEmpty()) {
             File imagen = new File(peli.getImagen());
             if (imagen.exists()) {

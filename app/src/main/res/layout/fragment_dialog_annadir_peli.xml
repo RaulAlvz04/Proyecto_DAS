@@ -48,4 +48,11 @@
         android:numStars="5"
         android:stepSize="0.5" />
 
+    <CheckBox
+        android:id="@+id/cbPendiente"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="@string/marcar_como_pendiente" />
+
 </LinearLayout>

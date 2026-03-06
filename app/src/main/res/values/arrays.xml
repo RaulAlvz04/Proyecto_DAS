@@ -1,0 +1,10 @@
+<resources>
+    <string-array name="idiomas_nombres">
+        <item>Español</item>
+        <item>Euskara</item>
+    </string-array>
+    <string-array name="idiomas_valores">
+        <item>es</item>
+        <item>eu</item>
+    </string-array>
+</resources>

@@ -2,7 +2,9 @@ package com.example.proyecto_das;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,10 +23,13 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.preference.PreferenceManager;
 import androidx.room.Room;
 
 import com.example.proyecto_das.db.AppDatabase;
 import com.example.proyecto_das.db.Usuario;
+
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -32,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        aplicarConfiguracion();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -61,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
                 String pass = etPassword.getText().toString();
 
                 if (email.isEmpty() || pass.isEmpty()){
-                    Toast.makeText(MainActivity.this, "Rellena todos los campos", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, R.string.rellenaCampos, Toast.LENGTH_SHORT).show();
                     return;
                 }
                 else {
@@ -69,10 +75,12 @@ public class MainActivity extends AppCompatActivity {
                     if (user != null){
                         Intent intent = new Intent(MainActivity.this, ListaPeliculasActivity.class);
                         intent.putExtra("ID_USUARIO", user.id);
+                        intent.putExtra("EMAIL_USUARIO", user.email);
                         startActivity(intent);
+                        finish();
                     }
                     else {
-                        Toast.makeText(MainActivity.this, "Usuario o contraseña incorrectos", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, R.string.loginMal, Toast.LENGTH_SHORT).show();
                         return;
                     }
                 }
@@ -86,6 +94,21 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    private void aplicarConfiguracion() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String lang = prefs.getString("idioma_key", "es"); // "es" por defecto
+
+        Locale locale = new Locale(lang);
+        Locale.setDefault(locale);
+
+        Configuration config = new Configuration();
+        config.setLocale(locale);
+
+        // NOTA: Aunque salga tachado (deprecated), es la forma que pide el Laboratorio
+        // y la que mejor funciona para que no parpadee en negro.
+        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
     }
 
 }

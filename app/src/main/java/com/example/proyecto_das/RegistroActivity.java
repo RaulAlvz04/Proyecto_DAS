@@ -52,14 +52,14 @@ public class RegistroActivity extends AppCompatActivity {
                 String pass = regPass.getText().toString().trim();
 
                 if (email.isEmpty() || pass.isEmpty()) {
-                    Toast.makeText(RegistroActivity.this, "Rellena todos los campos", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegistroActivity.this, R.string.rellenaCampos, Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 Usuario usuarioExistente = db.usuarioDAO().buscarPorEmail(email);
 
                 if (usuarioExistente != null){
-                    Toast.makeText(RegistroActivity.this, "Ya existe un usuario con ese email",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegistroActivity.this, R.string.existeUsuario,Toast.LENGTH_SHORT).show();
                 }
                 else {
                     Usuario nuevoUsuario = new Usuario(pass,email);
@@ -67,7 +67,7 @@ public class RegistroActivity extends AppCompatActivity {
 
                     enviarNotificacion();
 
-                    Toast.makeText(RegistroActivity.this, "Usuario creado", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegistroActivity.this, R.string.usuario_creado, Toast.LENGTH_SHORT).show();
                     finish();
                 }
             }
@@ -86,8 +86,8 @@ public class RegistroActivity extends AppCompatActivity {
         }
 
         builder.setSmallIcon(android.R.drawable.stat_sys_warning)
-                .setContentTitle("¡Bienvenido/a!")
-                .setContentText("Te has registrado correctamente. Disfruta de la aplicación.")
+                .setContentTitle(getString(R.string.bienvenida))
+                .setContentText(getString(R.string.mensajeBienvenida))
                 .setVibrate(new long[]{0, 1000, 500, 1000})
                 .setAutoCancel(true);
 

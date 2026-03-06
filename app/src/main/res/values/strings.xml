@@ -42,4 +42,24 @@
     <string name="btn_cancelarAnnadir">Cancelar</string>
     <string name="msg_permiso_denegado">Permiso denegado</string>
     <string name="msg_peli_borrada">Película eliminada</string>
+    <string name="ajustes">Ajustes</string>
+    <string name="ayuda">Ayuda</string>
+    <string name="titulo_lista" >Todas la películas</string>
+    <string name="mensajeAyuda" >Para añadir una película usa el botón +, para eliminar mantén pulsado sobre ella.</string>
+    <string name="rellenaCampos" >Rellena todos los campos</string>
+    <string name="loginMal" >Usuario o contraseña incorrectos</string>
+    <string name="mis_pendientes">Mis Pendientes</string>
+    <string name="existeUsuario">Ya existe un usuario con ese email</string>
+    <string name="usuario_creado">Usuario creado</string>
+    <string name="bienvenida">Bienvenido/a</string>
+    <string name="mensajeBienvenida" >Te has registrado correctamente. Disfruta de la aplicación.</string>
+    <string name="mis_pel_culas">Mis Películas</string>
+    <string name="configuraci_n_de_idioma">Configuración de Idioma</string>
+    <string name="seleccionar_idioma">Seleccionar idioma</string>
+    <string name="navegaci_n">Navegación</string>
+    <string name="inicio">Inicio</string>
+    <string name="mis_pendientes_watchlist">Mis Pendientes (WatchList)</string>
+    <string name="configuraci_n">Configuración</string>
+    <string name="marcar_como_pendiente" >¿Pendiente de ver?</string>
+    <string name="pendiente">Pendiente de Ver</string>
 </resources>

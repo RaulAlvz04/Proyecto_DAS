@@ -24,7 +24,7 @@ import java.io.File;
 
 public class DetallePeliculaActivity extends AppCompatActivity {
 
-    TextView tvTitulo, tvGenero, tvOpinion;
+    TextView tvTitulo, tvGenero, tvOpinion, tvPendiente;
     RatingBar rbValoracion;
     ImageView ivDetalle;
     int idPeli;
@@ -48,6 +48,7 @@ public class DetallePeliculaActivity extends AppCompatActivity {
         ivDetalle = findViewById(R.id.imgDetalle);
         btnEditar = findViewById(R.id.btnEditar);
         btnCompartir = findViewById(R.id.btnCompartir);
+        tvPendiente = findViewById(R.id.txtDetallePendiente);
 
         idPeli = getIntent().getIntExtra("ID_PELICULA", -1);
 
@@ -87,6 +88,12 @@ public class DetallePeliculaActivity extends AppCompatActivity {
         tvGenero.setText(peli.getGenero());
         tvOpinion.setText(peli.getOpinion());
         rbValoracion.setRating(peli.getValoracion());
+
+        if (peli.isEsPendiente()) {
+            tvPendiente.setVisibility(View.VISIBLE);
+        } else {
+            tvPendiente.setVisibility(View.GONE);
+        }
 
         if (peli.getImagen() != null && !peli.getImagen().isEmpty()) {
             File imagen = new File(peli.getImagen());

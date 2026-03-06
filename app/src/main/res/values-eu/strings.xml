@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Proyecto_DAS</string>
+    <string name="app_name">Proiektua_DAS</string>
     <string name="g_nero_drama">Generoa: Drama</string>
     <string name="mi_opini_n">Nire iritzia:</string>
     <string name="opinionTexto">Hona hemen erabiltzaileak filma erregistratzean idatzi zuen iritzi osoa.</string>
@@ -43,4 +43,24 @@
     <string name="btn_cancelarAnnadir">Ezeztatu</string>
     <string name="msg_permiso_denegado">Baimena ukatuta</string>
     <string name="msg_peli_borrada">Filma ezabatuta</string>
+    <string name="ajustes">Egokitzeak</string>
+    <string name="ayuda">Laguntza</string>
+    <string name="titulo_lista" >Film guztiak</string>
+    <string name="mensajeAyuda" >Film bat gehitseko + botoia erabili. Filma ezabatzeko luze sakatu beraren gainean.</string>
+    <string name="rellenaCampos" >Bete datu guztiak</string>
+    <string name="loginMal" >Erabiltzaile edo pasahitza ez dira zuzenak</string>
+    <string name="mis_pendientes">Ikusteko Filmak</string>
+    <string name="existeUsuario">Lehendik badago email hori duen erabiltzaile bat</string>
+    <string name="usuario_creado">Erabiltzaile sortuta</string>
+    <string name="bienvenida">Ongi etorri</string>
+    <string name="mensajeBienvenida" >Behar bezala erregistratu zara. Gozatu aplikazioaz.</string>
+    <string name="mis_pel_culas">Nire Filmak</string>
+    <string name="configuraci_n_de_idioma">Hizkuntzaren konfigurazioa</string>
+    <string name="seleccionar_idioma">Aukeratu hizkuntza</string>
+    <string name="navegaci_n">Nabigazioa</string>
+    <string name="inicio">Sarrera</string>
+    <string name="mis_pendientes_watchlist">Ikusteko Filmak (WatchList)</string>
+    <string name="configuraci_n">Konfigurazioa</string>
+    <string name="marcar_como_pendiente" >Ikusteko dago?</string>
+    <string name="pendiente">Ikusteko</string>
 </resources>

@@ -21,6 +21,7 @@ public class PeliculaViewHolder extends RecyclerView.ViewHolder {
     public ImageView imagen;
 
     public ImageView favorito;
+    public TextView pendiente;
 
     public int idPeliculaActual;
 
@@ -31,6 +32,7 @@ public class PeliculaViewHolder extends RecyclerView.ViewHolder {
         valoracion = itemView.findViewById(R.id.ratingPeli);
         imagen = itemView.findViewById(R.id.imgPortada);
         favorito = itemView.findViewById(R.id.imgFavorito);
+        pendiente = itemView.findViewById(R.id.txtPendienteEtiqueta);
 
         itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override

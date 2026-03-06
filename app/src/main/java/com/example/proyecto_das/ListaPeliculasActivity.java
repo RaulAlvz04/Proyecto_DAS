@@ -2,26 +2,25 @@ package com.example.proyecto_das;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.DialogFragment;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
@@ -33,6 +32,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.List;
+import java.util.Locale;
 
 public class ListaPeliculasActivity extends AppCompatActivity implements DialogAnnadirPeli.ListenerDAP, DialogBorrarPeli.ListenerDBP {
 
@@ -41,19 +41,25 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
     private PeliculaDAO peliDao;
 
     private int idUsuarioLogueado;
+    private String emailUsuario;
 
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_lista_peliculas);
+
+        emailUsuario = getIntent().getStringExtra("EMAIL_USUARIO");
 
         Toolbar toolbar = findViewById(R.id.laBarra);
         setSupportActionBar(toolbar);
 
         DrawerLayout elMenuDesplegable = findViewById(R.id.drawer_layout);
         NavigationView elNavigation = findViewById(R.id.nav_view);
+        View headerView = elNavigation.getHeaderView(0);
+
+        TextView tvEmail = headerView.findViewById(R.id.tvUserEmail);
+        tvEmail.setText(emailUsuario);
 
         elNavigation.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -65,20 +71,17 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
                     lista.clear();
                     lista.addAll(peliDao.getPelisPorUsuario(idUsuarioLogueado));
                     adapter.notifyDataSetChanged();
-                    getSupportActionBar().setTitle("Todas las Películas");
+                    getSupportActionBar().setTitle(R.string.titulo_lista);
                 }
                 else if (id == R.id.nav_pendientes) {
-                    // Cargar solo pendientes
-                    List<Pelicula> pendientes = peliDao.getPendientesUsuario(idUsuarioLogueado);
-                    lista.clear();
-                    lista.addAll(pendientes);
-                    adapter.notifyDataSetChanged();
-                    getSupportActionBar().setTitle("Mis Pendientes");
+                    Intent intent = new Intent(ListaPeliculasActivity.this, PendientesActivity.class);
+                    intent.putExtra("ID_USUARIO",idUsuarioLogueado);
+                    startActivity(intent);
                 }
                 else if (id == R.id.nav_ajustes) {
                     // Ir a la actividad de Ajustes
-                    //Intent i = new Intent(ListaPeliculasActivity.this, AjustesActivity.class);
-                    //startActivity(i);
+                    Intent i = new Intent(ListaPeliculasActivity.this, AjustesActivity.class);
+                    startActivity(i);
                 }
 
                 elMenuDesplegable.closeDrawers();
@@ -100,7 +103,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
                         lista.clear();
                         lista.addAll(todas);
                         adapter.notifyDataSetChanged();
-                        getSupportActionBar().setTitle("Todas las Películas");
+                        getSupportActionBar().setTitle(R.string.titulo_lista);
                     } else {
                         finish(); // Si no hay filtros, cerramos la actividad
                     }
@@ -110,6 +113,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
 
         getSupportActionBar().setHomeAsUpIndicator(android.R.drawable.ic_menu_sort_by_size);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(R.string.titulo_lista);
 
         idUsuarioLogueado = getIntent().getIntExtra("ID_USUARIO", -1);
 
@@ -139,9 +143,9 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
     }
 
     @Override
-    public void alPulsarAnnadir(String titulo, String genero, String anno, float valoracion) {
+    public void alPulsarAnnadir(String titulo, String genero, String anno, float valoracion, boolean esPendiente) {
 
-        Pelicula nuevaPeli = new Pelicula(titulo,anno,genero,valoracion,null, false, null, true, idUsuarioLogueado);
+        Pelicula nuevaPeli = new Pelicula(titulo,anno,genero,valoracion,null, false, null, esPendiente, idUsuarioLogueado);
         peliDao.insert(nuevaPeli);
 
         lista.clear();
@@ -160,7 +164,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
         lista.remove(posicion);
         adapter.notifyItemRemoved(posicion);
 
-        Toast.makeText(this, "Película eliminada", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.msg_borrar, Toast.LENGTH_SHORT).show();
     }
 
     public void ponerFavorito(int posicion) {
@@ -175,6 +179,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
     }
 
     protected void onResume() {
+        aplicarConfiguracion();
         super.onResume();
 
         List <Pelicula> listaActualizada = peliDao.getPelisPorUsuario(idUsuarioLogueado);
@@ -210,13 +215,12 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
             lista.addAll(favoritos);
 
             adapter.notifyDataSetChanged();
-
-            Toast.makeText(this, "Mostrando favoritos", Toast.LENGTH_SHORT).show();
             return true;
+
         } else if (id == R.id.accion_ayuda) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Ayuda");
-            builder.setMessage("Para añadir una película usa el botón +, para eliminar mantén pulsado sobre ella.");
+            builder.setTitle(R.string.ayuda);
+            builder.setMessage(R.string.mensajeAyuda);
             builder.setPositiveButton("Entendido", null);
             builder.show();
             return true;
@@ -225,5 +229,18 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
         return super.onOptionsItemSelected(item);
     }
 
+    private void aplicarConfiguracion() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String lang = prefs.getString("idioma_key", "es");
 
+        Locale locale = new Locale(lang);
+        Locale.setDefault(locale);
+
+        Configuration config = new Configuration();
+        config.setLocale(locale);
+
+        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
+    }
 }
+
+

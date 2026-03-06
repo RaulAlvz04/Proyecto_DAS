@@ -3,25 +3,25 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <item android:title="Navegación">
+    <item android:title="@string/navegaci_n">
         <menu>
             <item
                 android:id="@+id/nav_inicio"
                 android:icon="@android:drawable/ic_menu_today"
-                android:title="Inicio" />
+                android:title="@string/inicio" />
             <item
                 android:id="@+id/nav_pendientes"
                 android:icon="@android:drawable/ic_menu_recent_history"
-                android:title="Mis Pendientes (WatchList)" />
+                android:title="@string/mis_pendientes_watchlist" />
         </menu>
     </item>
 
-    <item android:title="Configuración">
+    <item android:title="@string/configuraci_n">
         <menu>
             <item
                 android:id="@+id/nav_ajustes"
                 android:icon="@android:drawable/ic_menu_preferences"
-                android:title="Ajustes" />
+                android:title="@string/ajustes" />
         </menu>
     </item>
 </menu>
