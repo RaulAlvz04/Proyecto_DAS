@@ -42,6 +42,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
 
     private int idUsuarioLogueado;
     private String emailUsuario;
+    private String idiomaActual;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -139,6 +140,8 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
                 dialogoAnnadir.show(getSupportFragmentManager(), "dialogoAnnadir");
             }
         });
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        idiomaActual = prefs.getString("idioma_key", "es");
 
     }
 
@@ -178,18 +181,32 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
         adapter.notifyItemChanged(posicion);
     }
 
+    @Override
     protected void onResume() {
-        aplicarConfiguracion();
         super.onResume();
 
-        List <Pelicula> listaActualizada = peliDao.getPelisPorUsuario(idUsuarioLogueado);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String langPref = prefs.getString("idioma_key", "es");
 
+
+        if (idiomaActual != null && !idiomaActual.equals(langPref)) {
+            // Si el idioma cambia reiniciamos
+            Intent intent = new Intent(this, ListaPeliculasActivity.class);
+            intent.putExtra("ID_USUARIO", idUsuarioLogueado);
+            intent.putExtra("EMAIL_USUARIO", emailUsuario);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            finish();
+            startActivity(intent);
+            overridePendingTransition(0, 0);
+            return;
+        }
+
+        idiomaActual = langPref; // Guardar idioma actual
+
+        List<Pelicula> listaActualizada = peliDao.getPelisPorUsuario(idUsuarioLogueado);
         lista.clear();
         lista.addAll(listaActualizada);
-
         adapter.notifyDataSetChanged();
-
-
     }
 
     @Override
@@ -229,17 +246,20 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
         return super.onOptionsItemSelected(item);
     }
 
-    private void aplicarConfiguracion() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+    @Override
+    protected void attachBaseContext(android.content.Context newBase) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(newBase);
         String lang = prefs.getString("idioma_key", "es");
 
         Locale locale = new Locale(lang);
         Locale.setDefault(locale);
 
-        Configuration config = new Configuration();
+        // ✅ Heredar config base del sistema
+        Configuration config = new Configuration(newBase.getResources().getConfiguration());
         config.setLocale(locale);
 
-        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
+        android.content.Context context = newBase.createConfigurationContext(config);
+        super.attachBaseContext(context);
     }
 }
 
