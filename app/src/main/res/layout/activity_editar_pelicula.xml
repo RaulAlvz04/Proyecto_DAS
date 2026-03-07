@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FAFAFA"
+    android:background="@color/colorBackground"
     tools:context=".EditarPeliculaActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -16,6 +16,7 @@
             android:id="@+id/lblEditarEncabezado"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            style="@style/TextoDAS.Titulo"
             android:text="@string/modificar_pel_cula"
             android:textSize="24sp"
             android:textStyle="bold"
@@ -40,6 +41,7 @@
             android:id="@+id/tvCambiarImagen"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            style="@style/TextoDAS"
             android:layout_marginTop="8dp"
             android:text="@string/toca_para_cambiar_imagen"
             android:textSize="12sp"
@@ -51,28 +53,31 @@
             android:id="@+id/editTitulo"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
             android:hint="@string/t_tulo_de_la_pel_cula"
             android:inputType="textCapSentences"
-            android:layout_marginTop="24dp"
-            app:layout_constraintTop_toBottomOf="@id/tvCambiarImagen"
+            android:minHeight="48dp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/tvCambiarImagen" />
 
         <EditText
             android:id="@+id/editGenero"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="@string/g_nero_ej_terror_comedia"
             android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/editTitulo"
+            android:hint="@string/g_nero_ej_terror_comedia"
+            android:minHeight="48dp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/editTitulo" />
 
         <TextView
             android:id="@+id/lblRating"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/tu_valoraci_n"
+            style="@style/TextoDAS"
             android:layout_marginTop="20dp"
             app:layout_constraintTop_toBottomOf="@id/editGenero"
             app:layout_constraintStart_toStartOf="parent" />
@@ -102,33 +107,48 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/opini_n_cr_tica"
+            style="@style/TextoDAS"
             android:textStyle="bold"
             android:layout_marginTop="20dp"
             app:layout_constraintTop_toBottomOf="@id/checkEditarPendiente"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <EditText
-            android:id="@+id/editOpinion"
+        <LinearLayout
+            android:id="@+id/layoutOpinion"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="@string/escribe_aqu_qu_te_ha_parecido"
-            android:gravity="top"
-            android:inputType="textMultiLine"
-            android:lines="5"
-            android:background="@android:drawable/editbox_background"
-            android:padding="10dp"
+            android:background="@color/colorSecondary"
+            android:padding="1dp"
             android:layout_marginTop="8dp"
             app:layout_constraintTop_toBottomOf="@id/lblOpinion"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <EditText
+                android:id="@+id/editOpinion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/escribe_aqu_qu_te_ha_parecido"
+                android:gravity="top"
+                android:inputType="textMultiLine"
+                android:lines="5"
+                android:textColor="@color/white"
+                android:textColorHint="@color/gris"
+                android:background="@color/colorSurface"
+                android:padding="10dp" />
+
+        </LinearLayout>
+
+
         <Button
             android:id="@+id/btnGuardarCambios"
             android:layout_width="0dp"
             android:layout_height="60dp"
             android:text="@string/guardar_cambios"
+            style="@style/BotonDAS"
             android:textStyle="bold"
             android:layout_marginTop="32dp"
-            app:layout_constraintTop_toBottomOf="@id/editOpinion"
+            app:layout_constraintTop_toBottomOf="@id/layoutOpinion"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -138,7 +158,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/cancelar"
-            android:textColor="@color/black"
+            android:textColor="@color/colorSecondary"
             android:layout_marginTop="8dp"
             app:layout_constraintTop_toBottomOf="@id/btnGuardarCambios"
             app:layout_constraintStart_toStartOf="parent"

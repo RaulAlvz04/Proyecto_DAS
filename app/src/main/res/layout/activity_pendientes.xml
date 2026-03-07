@@ -5,15 +5,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".PendientesActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/laBarra2"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        android:elevation="4dp"
-        app:titleTextColor="@android:color/white"
+        android:background="@color/colorSurface"
+        android:elevation="8dp"
+        app:titleTextColor="@color/white"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView

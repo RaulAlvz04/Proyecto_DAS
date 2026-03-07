@@ -2,11 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="176dp"
-    android:background="?attr/colorPrimary"
+    android:background="#D0F7F0"
     android:gravity="bottom"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark">
+    android:padding="16dp">
 
     <ImageView
         android:layout_width="64dp"
@@ -18,13 +17,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/mis_pel_culas"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        style="@style/TextoCabeceraDAS"
         android:textStyle="bold" />
 
     <TextView
         android:id="@+id/tvUserEmail"
+        style="@style/TextoDAS"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textColor="@color/gris"
         android:text="usuario@gmail.com" />
 
 </LinearLayout>

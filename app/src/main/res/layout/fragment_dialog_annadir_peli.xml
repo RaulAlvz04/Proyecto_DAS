@@ -3,14 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="20dp">
+    android:padding="20dp"
+    android:background="@color/colorSurface">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        style="@style/TextoDAS.Titulo"
         android:text="@string/annadir_pel_cula"
-        android:textSize="18sp"
-        android:textStyle="bold"
         android:layout_marginBottom="10dp"/>
 
     <EditText
@@ -18,7 +18,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/t_tulo"
-        android:inputType="textCapSentences" />
+        android:inputType="textCapSentences"
+        android:textColor="@color/white"
+        android:textColorHint="@color/gris"
+        android:backgroundTint="@color/colorSecondary" />
 
     <EditText
         android:id="@+id/etAnno"
@@ -26,16 +29,23 @@
         android:layout_height="wrap_content"
         android:hint="@string/a_o"
         android:inputType="number"
-        android:layout_marginTop="10dp" />
+        android:layout_marginTop="10dp"
+        android:textColor="@color/white"
+        android:textColorHint="@color/gris"
+        android:backgroundTint="@color/colorSecondary" />
 
     <EditText
         android:id="@+id/etGenero"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/g_nero"
-        android:layout_marginTop="10dp" />
+        android:layout_marginTop="10dp"
+        android:textColor="@color/white"
+        android:textColorHint="@color/gris"
+        android:backgroundTint="@color/colorSecondary" />
 
     <TextView
+        style="@style/TextoDAS"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/valoraci_n"
@@ -53,6 +63,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="@string/marcar_como_pendiente" />
+        android:text="@string/marcar_como_pendiente"
+        android:textColor="@color/white"
+        android:buttonTint="@color/colorSecondary" />
 
 </LinearLayout>

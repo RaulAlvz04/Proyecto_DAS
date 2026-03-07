@@ -63,4 +63,6 @@
     <string name="configuraci_n">Konfigurazioa</string>
     <string name="marcar_como_pendiente" >Ikusteko dago?</string>
     <string name="pendiente">Ikusteko</string>
+    <string name="recordatorio" >Gogoratu!</string>
+    <string name="mensajeRecuerdo" >Oraindik ikusteko dituzu film batzuk</string>
 </resources>

@@ -73,6 +73,10 @@ public class MainActivity extends AppCompatActivity {
                 else {
                     Usuario user = db.usuarioDAO().login(email,pass);
                     if (user != null){
+
+                        // Resetear el flag
+                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                        prefs.edit().putBoolean("notif_enviada_" + user.id, false).apply();
                         Intent intent = new Intent(MainActivity.this, ListaPeliculasActivity.class);
                         intent.putExtra("ID_USUARIO", user.id);
                         intent.putExtra("EMAIL_USUARIO", user.email);
@@ -106,8 +110,6 @@ public class MainActivity extends AppCompatActivity {
         Configuration config = new Configuration();
         config.setLocale(locale);
 
-        // NOTA: Aunque salga tachado (deprecated), es la forma que pide el Laboratorio
-        // y la que mejor funciona para que no parpadee en negro.
         getResources().updateConfiguration(config, getResources().getDisplayMetrics());
     }
 

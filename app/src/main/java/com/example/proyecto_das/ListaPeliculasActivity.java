@@ -1,9 +1,13 @@
 package com.example.proyecto_das;
 
 import android.annotation.SuppressLint;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,6 +21,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.DialogFragment;
@@ -207,6 +212,15 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
         lista.clear();
         lista.addAll(listaActualizada);
         adapter.notifyDataSetChanged();
+
+        boolean notifEnviada = prefs.getBoolean("notif_enviada_" + idUsuarioLogueado, false);
+        if (!notifEnviada) {
+            List<Pelicula> pendientes = peliDao.getPendientesUsuario(idUsuarioLogueado);
+            if (!pendientes.isEmpty()) {
+                enviarNotificacion();
+            }
+            prefs.edit().putBoolean("notif_enviada_" + idUsuarioLogueado, true).apply();
+        }
     }
 
     @Override
@@ -235,7 +249,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
             return true;
 
         } else if (id == R.id.accion_ayuda) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.DialogDAS);
             builder.setTitle(R.string.ayuda);
             builder.setMessage(R.string.mensajeAyuda);
             builder.setPositiveButton("Entendido", null);
@@ -254,12 +268,33 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
         Locale locale = new Locale(lang);
         Locale.setDefault(locale);
 
-        // ✅ Heredar config base del sistema
+        // Heredar config base del sistema
         Configuration config = new Configuration(newBase.getResources().getConfiguration());
         config.setLocale(locale);
 
         android.content.Context context = newBase.createConfigurationContext(config);
         super.attachBaseContext(context);
+    }
+
+    private void enviarNotificacion() {
+
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "Canal02");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel canal = new NotificationChannel("Canal02", "CanalRecordatorio",
+                    NotificationManager.IMPORTANCE_DEFAULT);
+
+            manager.createNotificationChannel(canal);
+        }
+
+        builder.setSmallIcon(android.R.drawable.stat_sys_warning)
+                .setContentTitle(getString(R.string.recordatorio))
+                .setContentText(getString(R.string.mensajeRecuerdo))
+                .setVibrate(new long[]{0, 1000, 500, 1000})
+                .setAutoCancel(true);
+
+        manager.notify(1, builder.build());
+
     }
 }
 

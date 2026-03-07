@@ -62,4 +62,6 @@
     <string name="configuraci_n">Configuración</string>
     <string name="marcar_como_pendiente" >¿Pendiente de ver?</string>
     <string name="pendiente">Pendiente de Ver</string>
+    <string name="recordatorio" >¡Recuerda!</string>
+    <string name="mensajeRecuerdo" >Tienes algunas películas aún pendientes de ver</string>
 </resources>

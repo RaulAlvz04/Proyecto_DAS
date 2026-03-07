@@ -17,8 +17,8 @@
             android:id="@+id/laBarra"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            android:elevation="4dp"
+            android:background="@color/colorSurface"
+            android:elevation="8dp"
             app:titleTextColor="@android:color/white"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -29,16 +29,18 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/laBarra" /> <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btnAdd"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="24dp"
-        android:src="@android:drawable/ic_input_add"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:backgroundTint="#6200EE"
-        android:contentDescription="Añadir" />
+            app:layout_constraintTop_toBottomOf="@id/laBarra" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btnAdd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="24dp"
+            android:src="@android:drawable/ic_input_add"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:backgroundTint="@color/colorSecondary"
+            android:contentDescription="Añadir" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -49,6 +51,11 @@
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/la_cabecera"
-        app:menu="@menu/las_opciones" />
+        android:theme="@style/ThemeOverlay.MaterialComponents.Dark"
+        app:menu="@menu/las_opciones"
+        app:itemTextColor="@color/white"
+        app:itemIconTint="@color/colorSecondary"
+        app:itemBackground="@color/colorSurface"
+        android:background="@color/colorSurface"/>
 
 </androidx.drawerlayout.widget.DrawerLayout>

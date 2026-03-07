@@ -30,7 +30,7 @@ public class DialogBorrarPeli extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         super.onCreateDialog(savedInstanceState);
         miListener = (ListenerDBP) getActivity();
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.DialogDAS);
         builder.setTitle(getString(R.string.titulo_borrar));
         builder.setMessage(getString(R.string.msg_borrar));
 

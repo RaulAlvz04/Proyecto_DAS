@@ -26,7 +26,7 @@ public class DialogAnnadirPeli extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         super.onCreateDialog(savedInstanceState);
         miListener = (ListenerDAP) getActivity();
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.DialogDAS);
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View vista = inflater.inflate(R.layout.fragment_dialog_annadir_peli, null);
 
