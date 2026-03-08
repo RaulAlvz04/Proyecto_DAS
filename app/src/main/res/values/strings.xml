@@ -64,4 +64,5 @@
     <string name="pendiente">Pendiente de Ver</string>
     <string name="recordatorio" >¡Recuerda!</string>
     <string name="mensajeRecuerdo" >Tienes algunas películas aún pendientes de ver</string>
+    <string name="entendido">Entendido</string>
 </resources>

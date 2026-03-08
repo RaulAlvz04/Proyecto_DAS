@@ -41,9 +41,9 @@ public class DialogAnnadirPeli extends DialogFragment {
                 setPositiveButton(getString(R.string.btn_annadir), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        String titulo = etTitulo.getText().toString();
-                        String anno = etAnno.getText().toString();
-                        String genero = etGenero.getText().toString();
+                        String titulo = etTitulo.getText().toString().trim();
+                        String anno = etAnno.getText().toString().trim();
+                        String genero = etGenero.getText().toString().trim();
                         float valoracion = etValoracion.getRating();
                         boolean esPendiente = cbEsPendiente.isChecked();
 

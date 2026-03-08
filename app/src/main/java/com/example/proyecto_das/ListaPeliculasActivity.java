@@ -252,7 +252,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.DialogDAS);
             builder.setTitle(R.string.ayuda);
             builder.setMessage(R.string.mensajeAyuda);
-            builder.setPositiveButton("Entendido", null);
+            builder.setPositiveButton(R.string.entendido, null);
             builder.show();
             return true;
         }
