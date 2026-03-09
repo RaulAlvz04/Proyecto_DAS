@@ -50,16 +50,18 @@ public class EditarPeliculaActivity extends AppCompatActivity {
     Pelicula peliculaActual;
     int idPeli;
 
+    // Launcher para manejar el resultado de abrir la galeria
     private ActivityResultLauncher<Intent> launcherGaleria = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                     Uri uri = result.getData().getData();
                     if (uri != null){
+                        // Al seleccionar una imagen de la galería, la copiamos a la aplicación.
                         String ruta = copiarImagen(uri);
                         if (ruta != null){
                             imagenPeli.setImageURI(Uri.fromFile(new File(ruta)));
-                            peliculaActual.setImagen(ruta);
+                            peliculaActual.setImagen(ruta); // Guardamos la ruta interna
                         }
                     }
                 }
@@ -86,9 +88,11 @@ public class EditarPeliculaActivity extends AppCompatActivity {
         imagenPeli = findViewById(R.id.imgPeli);
         cbPendiente = findViewById(R.id.checkEditarPendiente);
 
+        // Recuperamos el idPeli para saber los datos de que pelicula tenemos que mostrar.
         idPeli = getIntent().getIntExtra("ID_PELICULA", -1);
 
         if (idPeli != -1){
+            // Rellenamos los datos de la película
             peliculaActual = db.peliculaDao().getPeliPorId(idPeli);
             etTitulo.setText(peliculaActual.getTitulo());
             etGenero.setText(peliculaActual.getGenero());
@@ -111,6 +115,7 @@ public class EditarPeliculaActivity extends AppCompatActivity {
             }
         });
 
+        // Al guardar los datos, los actualizamos en la vista.
         btnGuardar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -125,6 +130,7 @@ public class EditarPeliculaActivity extends AppCompatActivity {
             }
         });
 
+        // Volvemos a DetallePeliculaActivity
         btnCancelar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -135,6 +141,7 @@ public class EditarPeliculaActivity extends AppCompatActivity {
 
     }
 
+    // Aplicamos un permiso u otro depende de la versión de Android
     private void verificarPermisosYGaleria() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             // Android 13+
@@ -168,6 +175,7 @@ public class EditarPeliculaActivity extends AppCompatActivity {
         }
     }
 
+    // Copiamos la imagen desde la galeria al almacenamiento interno de la aplicación.
     private String copiarImagen(Uri uri){
         try {
             // Borramos si hay alguna imagen antigua para ahorrar espacio

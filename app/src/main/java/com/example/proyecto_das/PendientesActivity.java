@@ -44,7 +44,6 @@ public class PendientesActivity extends AppCompatActivity {
                 AppDatabase.class, "cine-db").allowMainThreadQueries().build();
         List<Pelicula> listaPendientes = db.peliculaDao().getPendientesUsuario(idUsuarioLogueado);
 
-        // 4. Llenar el RecyclerView
         RecyclerView rv = findViewById(R.id.rvPendientes);
         rv.setLayoutManager(new LinearLayoutManager(this));
         rv.setAdapter(new PeliculaAdapter(listaPendientes));

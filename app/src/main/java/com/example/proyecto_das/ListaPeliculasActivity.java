@@ -55,6 +55,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lista_peliculas);
 
+        // Recogemos el email para mostrarlo en el NavigationDrawer
         emailUsuario = getIntent().getStringExtra("EMAIL_USUARIO");
 
         Toolbar toolbar = findViewById(R.id.laBarra);
@@ -67,6 +68,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
         TextView tvEmail = headerView.findViewById(R.id.tvUserEmail);
         tvEmail.setText(emailUsuario);
 
+        // Se hace una acción distinta dependiendo de la opción que seleccionemos
         elNavigation.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -80,6 +82,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
                     getSupportActionBar().setTitle(R.string.titulo_lista);
                 }
                 else if (id == R.id.nav_pendientes) {
+                    // Abrimos PendientesActivity para mostrar las peliculas pendientes
                     Intent intent = new Intent(ListaPeliculasActivity.this, PendientesActivity.class);
                     intent.putExtra("ID_USUARIO",idUsuarioLogueado);
                     startActivity(intent);
@@ -95,6 +98,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
             }
         });
 
+        // Al darle al botón de atrás, cerrar el menú lateral si está abierto o limpiar filtros
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
@@ -123,6 +127,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
 
         idUsuarioLogueado = getIntent().getIntExtra("ID_USUARIO", -1);
 
+        // Configurar RecyclerView para mostrar películas.
         RecyclerView rv = findViewById(R.id.miRecyView);
         rv.setLayoutManager(new LinearLayoutManager(this));
 
@@ -145,6 +150,8 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
                 dialogoAnnadir.show(getSupportFragmentManager(), "dialogoAnnadir");
             }
         });
+
+        // Guardamos el idioma actual para detectar cambios en onResume
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         idiomaActual = prefs.getString("idioma_key", "es");
 
@@ -153,9 +160,11 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
     @Override
     public void alPulsarAnnadir(String titulo, String genero, String anno, float valoracion, boolean esPendiente) {
 
+        // Creamos nueva pelicula
         Pelicula nuevaPeli = new Pelicula(titulo,anno,genero,valoracion,null, false, null, esPendiente, idUsuarioLogueado);
         peliDao.insert(nuevaPeli);
 
+        // Recargamos la lista
         lista.clear();
         lista.addAll(peliDao.getPelisPorUsuario(idUsuarioLogueado));
         adapter.notifyDataSetChanged();
@@ -165,6 +174,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
     @Override
     public void alConfirmarBorrado(int posicion) {
 
+        // Borramos la pelicula
         Pelicula peliABorrar = lista.get(posicion);
 
         peliDao.delete(peliABorrar);
@@ -213,6 +223,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
         lista.addAll(listaActualizada);
         adapter.notifyDataSetChanged();
 
+        // Verificamos si ya se ha mandado la notificación de recordatorio
         boolean notifEnviada = prefs.getBoolean("notif_enviada_" + idUsuarioLogueado, false);
         if (!notifEnviada) {
             List<Pelicula> pendientes = peliDao.getPendientesUsuario(idUsuarioLogueado);
@@ -260,6 +271,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
         return super.onOptionsItemSelected(item);
     }
 
+    // Añade el idioma seleccionado en el contexto de la actividad antes de que se cree.
     @Override
     protected void attachBaseContext(android.content.Context newBase) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(newBase);

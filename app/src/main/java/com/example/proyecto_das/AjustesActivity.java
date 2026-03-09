@@ -19,16 +19,19 @@ public class AjustesActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Aplicamos el idioma antes de nada
         aplicarConfiguracion();
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ajustes);
 
+        // Generamos la ToolBar con el titulo y un botón para ir hacia la anterior actividad
         Toolbar toolbar = findViewById(R.id.laBarra3);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.ajustes);
 
+        // Cargar el Fragment de Preferencias en el contenedor
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.settings_container, new Preferencias())
@@ -38,12 +41,13 @@ public class AjustesActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            finish();
+            finish(); // Cierra la actividad y vuelve a ListaPeliculasActivity
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    // Leemos el idioma guardado en SharedPreferences para saber que idioma mostrar en la aplicación
     private void aplicarConfiguracion() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String lang = prefs.getString("idioma_key", "es");

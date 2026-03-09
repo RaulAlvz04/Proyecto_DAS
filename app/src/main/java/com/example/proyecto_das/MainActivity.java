@@ -52,9 +52,6 @@ public class MainActivity extends AppCompatActivity {
         AppDatabase db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "cine-db").allowMainThreadQueries().build();
 
-        //1234
-        //prueba@gmail.com
-
         etEmail = findViewById(R.id.emailText);
         etPassword = findViewById(R.id.passText);
         Button btnEntrar = findViewById(R.id.botonAcceso);

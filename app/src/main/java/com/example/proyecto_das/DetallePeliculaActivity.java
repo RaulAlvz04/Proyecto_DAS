@@ -50,6 +50,7 @@ public class DetallePeliculaActivity extends AppCompatActivity {
         btnCompartir = findViewById(R.id.btnCompartir);
         tvPendiente = findViewById(R.id.txtDetallePendiente);
 
+        // Recuperamos el idPeli para saber los datos de que pelicula tenemos que mostrar.
         idPeli = getIntent().getIntExtra("ID_PELICULA", -1);
 
         btnEditar.setOnClickListener(new View.OnClickListener() {
@@ -61,6 +62,7 @@ public class DetallePeliculaActivity extends AppCompatActivity {
             }
         });
 
+        // Intent implicito para compartir la opinión por mensaje
         btnCompartir.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,6 +85,8 @@ public class DetallePeliculaActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        // Volvemos a cargar los datos de la pelicula por si se ha modificado alguno
+        // en EditarPeliculaActivity
         Pelicula peli = db.peliculaDao().getPeliPorId(idPeli);
         tvTitulo.setText(peli.getTitulo());
         tvGenero.setText(peli.getGenero());

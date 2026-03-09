@@ -34,6 +34,7 @@ public class PeliculaViewHolder extends RecyclerView.ViewHolder {
         favorito = itemView.findViewById(R.id.imgFavorito);
         pendiente = itemView.findViewById(R.id.txtPendienteEtiqueta);
 
+        // Mostramos el diálogo de Borrar Pelicula
         itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -49,6 +50,7 @@ public class PeliculaViewHolder extends RecyclerView.ViewHolder {
             }
         });
 
+        // Marcamos como favorito una pelicula
         favorito.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -61,6 +63,7 @@ public class PeliculaViewHolder extends RecyclerView.ViewHolder {
             }
         });
 
+        // Al hacer click sobre una pelicula vamos a DetallePeliculaActivity
         itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

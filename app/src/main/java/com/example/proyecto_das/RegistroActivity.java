@@ -74,6 +74,7 @@ public class RegistroActivity extends AppCompatActivity {
         });
     }
 
+    // Enviamos notificación al registrarnos correctamente
     private void enviarNotificacion() {
 
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
