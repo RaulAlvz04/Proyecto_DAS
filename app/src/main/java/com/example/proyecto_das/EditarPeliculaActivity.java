@@ -142,7 +142,7 @@ public class EditarPeliculaActivity extends AppCompatActivity {
     private void cargarDatosServidor() {
         new Thread(() -> {
             try {
-                URL url = new URL("http://34.136.199.32:81/peliculas.php?accion=por_id&idPeli=" + idPeli);
+                URL url = new URL("http://34.10.202.86:81/peliculas.php?accion=por_id&idPeli=" + idPeli);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 if (conn.getResponseCode() == 200) {
                     BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));

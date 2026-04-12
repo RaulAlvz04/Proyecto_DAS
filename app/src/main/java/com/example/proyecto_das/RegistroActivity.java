@@ -72,7 +72,7 @@ public class RegistroActivity extends AppCompatActivity {
             public void run() {
                 try {
                     // Configurar conexión para registrarnos
-                    URL url = new URL("http://34.136.199.32:81/registro.php");
+                    URL url = new URL("http://34.10.202.86:81/registro.php");
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestMethod("POST");
                     conn.setDoOutput(true);

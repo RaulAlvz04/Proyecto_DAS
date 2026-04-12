@@ -6,16 +6,23 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 
@@ -54,6 +61,9 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
     private String emailUsuario;
     private String idiomaActual;
 
+    private ImageView ivPerfilHeader;
+    private ActivityResultLauncher<Intent> takePictureLauncher;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +74,24 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
         emailUsuario = getIntent().getStringExtra("EMAIL_USUARIO");
         idUsuarioLogueado = getIntent().getIntExtra("ID_USUARIO", -1);
 
+        takePictureLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        // Obtener la miniatura (Bitmap)
+                        Bundle extras = result.getData().getExtras();
+                        Bitmap imageBitmap = (Bitmap) extras.get("data");
+
+                        // Mostrar la imagen en el ImageView del header
+                        if (ivPerfilHeader != null) {
+                            ivPerfilHeader.setImageBitmap(imageBitmap);
+                        }
+
+                        // NOTA: El siguiente paso será convertir este bitmap a Base64 y subirlo
+                    }
+                }
+        );
+
         Toolbar toolbar = findViewById(R.id.laBarra);
         setSupportActionBar(toolbar);
 
@@ -73,6 +101,24 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
 
         TextView tvEmail = headerView.findViewById(R.id.tvUserEmail);
         tvEmail.setText(emailUsuario);
+
+        ivPerfilHeader = headerView.findViewById(R.id.imgPerfilHeader);
+        Button btnCamara = headerView.findViewById(R.id.btnCamaraHeader);
+
+        btnCamara.setOnClickListener(v -> {
+            // Comprobar permisos para sacer foto
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (checkSelfPermission(android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{android.Manifest.permission.CAMERA}, 102);
+                } else {
+                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    takePictureLauncher.launch(takePictureIntent);
+                }
+            } else {
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                takePictureLauncher.launch(takePictureIntent);
+            }
+        });
 
         // Se hace una acción distinta dependiendo de la opción que seleccionemos
         elNavigation.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -152,7 +198,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
         new Thread(() -> {
             try {
                 // Usamos este endpoint para obtener todas la películas de un usuario o solo las favoritas desde el servidor
-                URL url = new URL("http://34.136.199.32:81/peliculas.php?accion=" + accion + "&idUsuario=" + idUsuarioLogueado);
+                URL url = new URL("http://34.10.202.86:81/peliculas.php?accion=" + accion + "&idUsuario=" + idUsuarioLogueado);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
                 if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
@@ -206,7 +252,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
         new Thread(() -> {
             try {
                 // Usamos el siguiente endpoint para añadir la peli a la base de datos remota
-                URL url = new URL("http://34.136.199.32:81/peliculas.php?accion=insertar");
+                URL url = new URL("http://34.10.202.86:81/peliculas.php?accion=insertar");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setDoOutput(true);
@@ -238,7 +284,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
         new Thread(() -> {
             try {
                 // Usamos este endpoint para eliminar la peli y borrarla de la base de datos remota
-                URL url = new URL("http://34.136.199.32:81/peliculas.php?accion=eliminar");
+                URL url = new URL("http://34.10.202.86:81/peliculas.php?accion=eliminar");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setDoOutput(true);
@@ -267,7 +313,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
 
         new Thread(() -> {
             try {
-                URL url = new URL("http://34.136.199.32:81/peliculas.php?accion=actualizar");
+                URL url = new URL("http://34.10.202.86:81/peliculas.php?accion=actualizar");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setDoOutput(true);
@@ -385,6 +431,16 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
 
         manager.notify(1, builder.build());
 
+    }
+
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 102 && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            takePictureLauncher.launch(takePictureIntent);
+        } else {
+            Toast.makeText(this, "Permiso de cámara necesario", Toast.LENGTH_SHORT).show();
+        }
     }
 }
 
