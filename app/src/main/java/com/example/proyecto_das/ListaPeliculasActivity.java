@@ -9,9 +9,11 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,10 +46,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -85,9 +89,8 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
                         // Mostrar la imagen en el ImageView del header
                         if (ivPerfilHeader != null) {
                             ivPerfilHeader.setImageBitmap(imageBitmap);
+                            subirFotoPerfil(imageBitmap);
                         }
-
-                        // NOTA: El siguiente paso será convertir este bitmap a Base64 y subirlo
                     }
                 }
         );
@@ -104,6 +107,8 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
 
         ivPerfilHeader = headerView.findViewById(R.id.imgPerfilHeader);
         Button btnCamara = headerView.findViewById(R.id.btnCamaraHeader);
+
+        descargarFotoPerfil();
 
         btnCamara.setOnClickListener(v -> {
             // Comprobar permisos para sacer foto
@@ -441,6 +446,68 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
         } else {
             Toast.makeText(this, "Permiso de cámara necesario", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void subirFotoPerfil(Bitmap bitmap) {
+        new Thread(() -> {
+            try {
+                // Convertir Bitmap a Base64
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 80, stream); // 80% calidad para no saturar
+                byte[] fototransformada = stream.toByteArray();
+                String fotoen64 = Base64.encodeToString(fototransformada, Base64.DEFAULT);
+
+                // Conectarnos al servidor
+                URL url = new URL("http://34.10.202.86:81/subirImagenPerfil.php");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setDoOutput(true);
+
+                // Enviamos la acción, el ID del usuario y el String de la imagen
+                String params = "accion=subir_foto" +
+                        "&idUsuario=" + idUsuarioLogueado +
+                        "&imagen=" + URLEncoder.encode(fotoen64, "UTF-8");
+
+                OutputStream os = conn.getOutputStream();
+                os.write(params.getBytes());
+                os.flush();
+                os.close();
+
+                if (conn.getResponseCode() == 200) {
+                    descargarFotoPerfil();
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    private void descargarFotoPerfil() {
+        new Thread(() -> {
+            try {
+                // La dirección apunta al archivo .jpg correspondiente a la foto de el usuario logueado
+                String direccion = "http://34.10.202.86:81/imagenesPerfil/user_" + idUsuarioLogueado + ".jpg";
+                URL destino = new URL(direccion);
+
+                HttpURLConnection conn = (HttpURLConnection) destino.openConnection();
+                conn.setUseCaches(false);
+                int responseCode = conn.getResponseCode();
+
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    Bitmap elBitmap = BitmapFactory.decodeStream(conn.getInputStream());
+
+                    // Actualizamos la interfaz
+                    runOnUiThread(() -> {
+                        if (ivPerfilHeader != null) {
+                            ivPerfilHeader.setImageBitmap(elBitmap);
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 }
 
