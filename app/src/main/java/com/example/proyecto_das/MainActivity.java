@@ -24,11 +24,14 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.preference.PreferenceManager;
-import androidx.room.Room;
 
-import com.example.proyecto_das.db.AppDatabase;
-import com.example.proyecto_das.db.Usuario;
+import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
@@ -49,9 +52,6 @@ public class MainActivity extends AppCompatActivity {
                     String[]{Manifest.permission.POST_NOTIFICATIONS}, 11);
         }
 
-        AppDatabase db = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "cine-db").allowMainThreadQueries().build();
-
         etEmail = findViewById(R.id.emailText);
         etPassword = findViewById(R.id.passText);
         Button btnEntrar = findViewById(R.id.botonAcceso);
@@ -68,22 +68,7 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
                 else {
-                    Usuario user = db.usuarioDAO().login(email,pass);
-                    if (user != null){
-
-                        // Resetear el flag
-                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
-                        prefs.edit().putBoolean("notif_enviada_" + user.id, false).apply();
-                        Intent intent = new Intent(MainActivity.this, ListaPeliculasActivity.class);
-                        intent.putExtra("ID_USUARIO", user.id);
-                        intent.putExtra("EMAIL_USUARIO", user.email);
-                        startActivity(intent);
-                        finish();
-                    }
-                    else {
-                        Toast.makeText(MainActivity.this, R.string.loginMal, Toast.LENGTH_SHORT).show();
-                        return;
-                    }
+                    login(email,pass);
                 }
             }
         });
@@ -95,6 +80,62 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    private void login(String email, String pass) {
+        new Thread(() -> {
+            try {
+                // Configuramos la URL para loguearnos
+                URL url = new URL("http://34.136.199.32:81/login.php");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setDoOutput(true);
+
+                // Parámetros para el login.php
+                String parametros = "email=" + email + "&password=" + pass;
+                OutputStream os = conn.getOutputStream();
+                os.write(parametros.getBytes());
+                os.flush();
+                os.close();
+
+                // Leemos la respuesta
+                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder res = new StringBuilder();
+                    String line;
+                    while ((line = in.readLine()) != null) res.append(line);
+                    in.close();
+
+                    JSONObject json = new JSONObject(res.toString());
+                    String status = json.getString("status");
+
+                    if (status.equals("ok")) {
+                        int id = json.getInt("id");
+                        String userEmail = json.getString("email");
+
+                        runOnUiThread(() -> {
+                            // Guardamos sesión en SharedPreferences
+                            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                            prefs.edit().putBoolean("notif_enviada_" + id, false).apply();
+                            // También guardamos el ID para usarlo en la lista de peliculas
+                            prefs.edit().putInt("userId", id).apply();
+
+                            Intent intent = new Intent(MainActivity.this, ListaPeliculasActivity.class);
+                            intent.putExtra("ID_USUARIO", id);
+                            intent.putExtra("EMAIL_USUARIO", userEmail);
+                            startActivity(intent);
+                            finish();
+                        });
+                    } else {
+                        // Si el login va mal se muestra un mensaje de error
+                        runOnUiThread(() -> Toast.makeText(MainActivity.this, R.string.loginMal, Toast.LENGTH_SHORT).show());
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Error de red: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+            }
+        }).start();
     }
 
     private void aplicarConfiguracion() {

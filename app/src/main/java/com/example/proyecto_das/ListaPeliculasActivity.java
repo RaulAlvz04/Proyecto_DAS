@@ -28,22 +28,27 @@ import androidx.fragment.app.DialogFragment;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.room.Room;
 
-import com.example.proyecto_das.db.AppDatabase;
 import com.example.proyecto_das.db.Pelicula;
-import com.example.proyecto_das.db.PeliculaDAO;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 public class ListaPeliculasActivity extends AppCompatActivity implements DialogAnnadirPeli.ListenerDAP, DialogBorrarPeli.ListenerDBP {
 
     private PeliculaAdapter adapter;
-    private List<Pelicula> lista;
-    private PeliculaDAO peliDao;
+    private List<Pelicula> lista = new ArrayList<>();
 
     private int idUsuarioLogueado;
     private String emailUsuario;
@@ -57,6 +62,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
 
         // Recogemos el email para mostrarlo en el NavigationDrawer
         emailUsuario = getIntent().getStringExtra("EMAIL_USUARIO");
+        idUsuarioLogueado = getIntent().getIntExtra("ID_USUARIO", -1);
 
         Toolbar toolbar = findViewById(R.id.laBarra);
         setSupportActionBar(toolbar);
@@ -76,9 +82,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
 
                 if (id == R.id.nav_inicio) {
                     // Cargar todas las películas
-                    lista.clear();
-                    lista.addAll(peliDao.getPelisPorUsuario(idUsuarioLogueado));
-                    adapter.notifyDataSetChanged();
+                    cargarPelisDesdeServidor("por_usuario");
                     getSupportActionBar().setTitle(R.string.titulo_lista);
                 }
                 else if (id == R.id.nav_pendientes) {
@@ -108,14 +112,11 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
                 }
                 else {
                     // Si el menú está cerrado pero la lista está filtrada, volvemos a mostrar todas
-                    List<Pelicula> todas = peliDao.getPelisPorUsuario(idUsuarioLogueado);
-                    if (lista.size() < todas.size()) {
-                        lista.clear();
-                        lista.addAll(todas);
-                        adapter.notifyDataSetChanged();
+                    if (!getSupportActionBar().getTitle().equals(getString(R.string.titulo_lista))) {
+                        cargarPelisDesdeServidor("por_usuario");
                         getSupportActionBar().setTitle(R.string.titulo_lista);
                     } else {
-                        finish(); // Si no hay filtros, cerramos la actividad
+                        finish(); // Si ya estamos en la lista principal, cerramos
                     }
                 }
             }
@@ -125,19 +126,9 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.titulo_lista);
 
-        idUsuarioLogueado = getIntent().getIntExtra("ID_USUARIO", -1);
-
         // Configurar RecyclerView para mostrar películas.
         RecyclerView rv = findViewById(R.id.miRecyView);
         rv.setLayoutManager(new LinearLayoutManager(this));
-
-        AppDatabase db = Room.databaseBuilder(getApplicationContext(),
-                        AppDatabase.class, "cine-db")
-                .allowMainThreadQueries()
-                .build();
-
-        peliDao = db.peliculaDao();
-        lista = peliDao.getPelisPorUsuario(idUsuarioLogueado);
 
         adapter = new PeliculaAdapter(lista);
         rv.setAdapter(adapter);
@@ -157,17 +148,84 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
 
     }
 
+    private void cargarPelisDesdeServidor(String accion) {
+        new Thread(() -> {
+            try {
+                // Usamos este endpoint para obtener todas la películas de un usuario o solo las favoritas desde el servidor
+                URL url = new URL("http://34.136.199.32:81/peliculas.php?accion=" + accion + "&idUsuario=" + idUsuarioLogueado);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder out = new StringBuilder();
+                    String line;
+                    while ((line = in.readLine()) != null) out.append(line);
+                    in.close();
+
+                    JSONArray array = new JSONArray(out.toString());
+                    lista.clear();
+                    for (int i = 0; i < array.length(); i++) {
+                        JSONObject obj = array.getJSONObject(i);
+                        Pelicula p = new Pelicula(
+                                obj.getString("titulo"),
+                                obj.getString("anno"),
+                                obj.getString("genero"),
+                                (float) obj.getDouble("valoracion"),
+                                obj.optString("opinion", ""),
+                                obj.getInt("esFavorito") == 1,
+                                obj.optString("imagen", ""),
+                                obj.getInt("esPendiente") == 1,
+                                obj.getInt("idUsuario")
+                        );
+                        p.setId(obj.getInt("id"));
+                        lista.add(p);
+                    }
+                    runOnUiThread(() -> adapter.notifyDataSetChanged());
+
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+                    boolean notifEnviada = prefs.getBoolean("notif_enviada_" + idUsuarioLogueado, false);
+
+                    // Enviamos notificación si hay alguna pendiente, no se envia si ya se ha enviado antes en esta sesión
+                    if (!notifEnviada) {
+                        for (Pelicula p : lista) {
+                            if (p.isEsPendiente()) {
+                                enviarNotificacion();
+                                prefs.edit().putBoolean("notif_enviada_" + idUsuarioLogueado, true).apply();
+                                break;
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) { e.printStackTrace(); }
+        }).start();
+    }
+
     @Override
     public void alPulsarAnnadir(String titulo, String genero, String anno, float valoracion, boolean esPendiente) {
 
-        // Creamos nueva pelicula
-        Pelicula nuevaPeli = new Pelicula(titulo,anno,genero,valoracion,null, false, null, esPendiente, idUsuarioLogueado);
-        peliDao.insert(nuevaPeli);
+        new Thread(() -> {
+            try {
+                // Usamos el siguiente endpoint para añadir la peli a la base de datos remota
+                URL url = new URL("http://34.136.199.32:81/peliculas.php?accion=insertar");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setDoOutput(true);
 
-        // Recargamos la lista
-        lista.clear();
-        lista.addAll(peliDao.getPelisPorUsuario(idUsuarioLogueado));
-        adapter.notifyDataSetChanged();
+                String params = "titulo=" + titulo + "&genero=" + genero + "&anno=" + anno +
+                        "&valoracion=" + valoracion + "&idUsuario=" + idUsuarioLogueado +
+                        "&esPendiente=" + (esPendiente ? 1 : 0);
+
+                OutputStream os = conn.getOutputStream();
+                os.write(params.getBytes());
+                os.flush();
+                os.close();
+
+                if (conn.getResponseCode() == 200) {
+                    // Recargamos para mostrar la nueva peli añadida
+                    cargarPelisDesdeServidor("por_usuario");
+                }
+            } catch (Exception e) { e.printStackTrace(); }
+        }).start();
 
     }
 
@@ -177,23 +235,60 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
         // Borramos la pelicula
         Pelicula peliABorrar = lista.get(posicion);
 
-        peliDao.delete(peliABorrar);
+        new Thread(() -> {
+            try {
+                // Usamos este endpoint para eliminar la peli y borrarla de la base de datos remota
+                URL url = new URL("http://34.136.199.32:81/peliculas.php?accion=eliminar");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setDoOutput(true);
+                String params = "idPeli=" + peliABorrar.getId();
 
-        lista.remove(posicion);
-        adapter.notifyItemRemoved(posicion);
+                OutputStream os = conn.getOutputStream();
+                os.write(params.getBytes());
+                os.flush(); os.close();
 
-        Toast.makeText(this, R.string.msg_borrar, Toast.LENGTH_SHORT).show();
+                if (conn.getResponseCode() == 200) {
+                    runOnUiThread(() -> {
+                        lista.remove(posicion);
+                        adapter.notifyItemRemoved(posicion);
+                        // Mostramos mensaje avisando de que la acción es irreversible
+                        Toast.makeText(this, R.string.msg_borrar, Toast.LENGTH_SHORT).show();
+                    });
+                }
+            } catch (Exception e) { e.printStackTrace(); }
+        }).start();
     }
 
     public void ponerFavorito(int posicion) {
 
         Pelicula peli = lista.get(posicion);
+        boolean nuevoEstado = !peli.isEsFavorito();
 
-        peli.setEsFavorito(!peli.esFavorito);
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://34.136.199.32:81/peliculas.php?accion=actualizar");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setDoOutput(true);
 
-        peliDao.update(peli);
+                String params = "id=" + peli.getId() + "&titulo=" + peli.getTitulo() + "&anno=" + peli.getAnno() +
+                        "&genero=" + peli.getGenero() + "&valoracion=" + peli.getValoracion() +
+                        "&opinion=" + peli.getOpinion() + "&esFavorito=" + (nuevoEstado ? 1 : 0) +
+                        "&esPendiente=" + (peli.isEsPendiente() ? 1 : 0) + "&imagen=" + peli.getImagen();
 
-        adapter.notifyItemChanged(posicion);
+                OutputStream os = conn.getOutputStream();
+                os.write(params.getBytes());
+                os.flush(); os.close();
+
+                if (conn.getResponseCode() == 200) {
+                    runOnUiThread(() -> {
+                        peli.setEsFavorito(nuevoEstado);
+                        adapter.notifyItemChanged(posicion);
+                    });
+                }
+            } catch (Exception e) { e.printStackTrace(); }
+        }).start();
     }
 
     @Override
@@ -218,20 +313,8 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
 
         idiomaActual = langPref; // Guardar idioma actual
 
-        List<Pelicula> listaActualizada = peliDao.getPelisPorUsuario(idUsuarioLogueado);
-        lista.clear();
-        lista.addAll(listaActualizada);
-        adapter.notifyDataSetChanged();
-
-        // Verificamos si ya se ha mandado la notificación de recordatorio
-        boolean notifEnviada = prefs.getBoolean("notif_enviada_" + idUsuarioLogueado, false);
-        if (!notifEnviada) {
-            List<Pelicula> pendientes = peliDao.getPendientesUsuario(idUsuarioLogueado);
-            if (!pendientes.isEmpty()) {
-                enviarNotificacion();
-            }
-            prefs.edit().putBoolean("notif_enviada_" + idUsuarioLogueado, true).apply();
-        }
+        // Recargamos todas la pelis por si hubiera habido algún cambio
+        cargarPelisDesdeServidor("por_usuario");
     }
 
     @Override
@@ -251,12 +334,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
             return true;
         }
         else if (id == R.id.accion_favoritos) {
-            List<Pelicula> favoritos = peliDao.getFavoritosUsuario(idUsuarioLogueado);
-
-            lista.clear();
-            lista.addAll(favoritos);
-
-            adapter.notifyDataSetChanged();
+            cargarPelisDesdeServidor("favoritos");
             return true;
 
         } else if (id == R.id.accion_ayuda) {

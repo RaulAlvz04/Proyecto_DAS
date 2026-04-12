@@ -25,6 +25,15 @@ import androidx.room.Room;
 import com.example.proyecto_das.db.AppDatabase;
 import com.example.proyecto_das.db.Usuario;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 public class RegistroActivity extends AppCompatActivity {
 
     EditText regEmail, regPass;
@@ -34,12 +43,7 @@ public class RegistroActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registro);
-
-        AppDatabase db = Room.databaseBuilder(getApplicationContext(),
-                        AppDatabase.class, "cine-db")
-                .allowMainThreadQueries()
-                .build();
-
+        
         regEmail = findViewById(R.id.regEmail);
         regPass = findViewById(R.id.regPass);
 
@@ -55,23 +59,72 @@ public class RegistroActivity extends AppCompatActivity {
                     Toast.makeText(RegistroActivity.this, R.string.rellenaCampos, Toast.LENGTH_SHORT).show();
                     return;
                 }
-
-                Usuario usuarioExistente = db.usuarioDAO().buscarPorEmail(email);
-
-                if (usuarioExistente != null){
-                    Toast.makeText(RegistroActivity.this, R.string.existeUsuario,Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    Usuario nuevoUsuario = new Usuario(pass,email);
-                    db.usuarioDAO().insert(nuevoUsuario);
-
-                    enviarNotificacion();
-
-                    Toast.makeText(RegistroActivity.this, R.string.usuario_creado, Toast.LENGTH_SHORT).show();
-                    finish();
-                }
+                
+                registrarUsuario(email,pass);
             }
         });
+    }
+
+    private void registrarUsuario(String email, String pass) {
+        // Hilo secundario para conectarse al servidor remoto
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    // Configurar conexión para registrarnos
+                    URL url = new URL("http://34.136.199.32:81/registro.php");
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("POST");
+                    conn.setDoOutput(true);
+
+                    // Parámetros para el PHP
+                    String parametros = "email=" + email + "&password=" + pass;
+
+                    OutputStream os = conn.getOutputStream();
+                    os.write(parametros.getBytes());
+                    os.flush();
+                    os.close();
+
+                    // Leer respuesta
+                    if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                        StringBuilder respuesta = new StringBuilder();
+                        String linea;
+                        while ((linea = in.readLine()) != null) {
+                            respuesta.append(linea);
+                        }
+                        in.close();
+
+                        // Procesamos JSON
+                        JSONObject json = new JSONObject(respuesta.toString());
+                        String status = json.getString("status");
+
+                        // Volver al hilo principal para actualizar la pantalla
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    if (status.equals("ok")) {
+                                        enviarNotificacion();
+                                        Toast.makeText(RegistroActivity.this, R.string.usuario_creado, Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    } else {
+                                        // Muestra el mensaje de "Ese email ya existe" que manda el PHP
+                                        String msg = json.getString("message");
+                                        Toast.makeText(RegistroActivity.this, msg, Toast.LENGTH_SHORT).show();
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    runOnUiThread(() -> Toast.makeText(RegistroActivity.this, "Error de red", Toast.LENGTH_SHORT).show());
+                }
+            }
+        }).start();
     }
 
     // Enviamos notificación al registrarnos correctamente

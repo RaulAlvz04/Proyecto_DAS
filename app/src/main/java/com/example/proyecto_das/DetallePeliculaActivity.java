@@ -9,16 +9,20 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.room.Room;
 
-import com.example.proyecto_das.db.AppDatabase;
-import com.example.proyecto_das.db.Pelicula;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import java.io.File;
 
@@ -29,17 +33,11 @@ public class DetallePeliculaActivity extends AppCompatActivity {
     ImageView ivDetalle;
     int idPeli;
     Button btnEditar, btnCompartir;
-    AppDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detalle_pelicula);
-
-        db = Room.databaseBuilder(getApplicationContext(),
-                        AppDatabase.class, "cine-db")
-                .allowMainThreadQueries()
-                .build();
 
         tvTitulo = findViewById(R.id.txtDetalleTitulo);
         tvGenero = findViewById(R.id.txtDetalleGenero);
@@ -84,29 +82,53 @@ public class DetallePeliculaActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-        // Volvemos a cargar los datos de la pelicula por si se ha modificado alguno
-        // en EditarPeliculaActivity
-        Pelicula peli = db.peliculaDao().getPeliPorId(idPeli);
-        tvTitulo.setText(peli.getTitulo());
-        tvGenero.setText(peli.getGenero());
-        tvOpinion.setText(peli.getOpinion());
-        rbValoracion.setRating(peli.getValoracion());
-
-        if (peli.isEsPendiente()) {
-            tvPendiente.setVisibility(View.VISIBLE);
-        } else {
-            tvPendiente.setVisibility(View.GONE);
+        if (idPeli != -1){
+            cargarDetallesDesdeServidor(); // Obtenemos los datos de la peli desde el servidor
         }
-
-        if (peli.getImagen() != null && !peli.getImagen().isEmpty()) {
-            File imagen = new File(peli.getImagen());
-            if (imagen.exists()) {
-                ivDetalle.setImageURI(Uri.fromFile(imagen));
-            }
-        } else {
-            ivDetalle.setImageResource(android.R.drawable.ic_menu_gallery);
-        }
-
     }
+
+    private void cargarDetallesDesdeServidor() {
+        new Thread(() -> {
+            try {
+                // Usamos el siguiente endpoint para buscar la peli por el id
+                URL url = new URL("http://34.136.199.32:81/peliculas.php?accion=por_id&idPeli=" + idPeli);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+                if (conn.getResponseCode() == 200) {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder out = new StringBuilder();
+                    String line;
+                    while ((line = in.readLine()) != null) out.append(line);
+                    in.close();
+
+                    JSONObject obj = new JSONObject(out.toString());
+
+                    // Actualizamos la UI en el hilo principal
+                    runOnUiThread(() -> {
+                        tvTitulo.setText(obj.optString("titulo"));
+                        tvGenero.setText(obj.optString("genero"));
+                        tvOpinion.setText(obj.optString("opinion", ""));
+                        rbValoracion.setRating((float) obj.optDouble("valoracion", 0));
+
+                        if (obj.optInt("esPendiente") == 1) {
+                            tvPendiente.setVisibility(View.VISIBLE);
+                        } else {
+                            tvPendiente.setVisibility(View.GONE);
+                        }
+
+                        // Para la imagen, si es una URL o ruta:
+                        String rutaImagen = obj.optString("imagen");
+                        if (!rutaImagen.isEmpty()) {
+                            ivDetalle.setImageURI(Uri.parse(rutaImagen));
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(() -> Toast.makeText(this, "Error al cargar detalle", Toast.LENGTH_SHORT).show());
+            }
+        }).start();
+    }
+
+
 }

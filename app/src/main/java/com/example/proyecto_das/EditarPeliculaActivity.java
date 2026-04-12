@@ -26,17 +26,22 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.room.Room;
 
-import com.example.proyecto_das.db.AppDatabase;
 import com.example.proyecto_das.db.Pelicula;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 
 public class EditarPeliculaActivity extends AppCompatActivity {
 
@@ -46,8 +51,7 @@ public class EditarPeliculaActivity extends AppCompatActivity {
     RatingBar rbValoracion;
     Button btnGuardar, btnCancelar;
     CheckBox cbPendiente;
-    AppDatabase db;
-    Pelicula peliculaActual;
+    Pelicula peliculaActual = new Pelicula("","","", 0, "", false,"", false, 0 );
     int idPeli;
 
     // Launcher para manejar el resultado de abrir la galeria
@@ -73,11 +77,6 @@ public class EditarPeliculaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editar_pelicula);
 
-        db = Room.databaseBuilder(getApplicationContext(),
-                        AppDatabase.class, "cine-db")
-                .allowMainThreadQueries()
-                .build();
-
         etTitulo = findViewById(R.id.editTitulo);
         etGenero = findViewById(R.id.editGenero);
         etOpinion = findViewById(R.id.editOpinion);
@@ -92,20 +91,7 @@ public class EditarPeliculaActivity extends AppCompatActivity {
         idPeli = getIntent().getIntExtra("ID_PELICULA", -1);
 
         if (idPeli != -1){
-            // Rellenamos los datos de la película
-            peliculaActual = db.peliculaDao().getPeliPorId(idPeli);
-            etTitulo.setText(peliculaActual.getTitulo());
-            etGenero.setText(peliculaActual.getGenero());
-            etOpinion.setText(peliculaActual.getOpinion());
-            rbValoracion.setRating(peliculaActual.getValoracion());
-            cbPendiente.setChecked(peliculaActual.isEsPendiente());
-
-            if (peliculaActual.getImagen() != null && !peliculaActual.getImagen().isEmpty()) {
-                File imagen = new File(peliculaActual.getImagen());
-                if (imagen.exists()) {
-                    imagenPeli.setImageURI(Uri.fromFile(imagen));
-                }
-            }
+            cargarDatosServidor(); // Obtenemos los datos de la peli desde el servidor
         }
 
         tvCambiarImagen.setOnClickListener(new View.OnClickListener() {
@@ -119,14 +105,7 @@ public class EditarPeliculaActivity extends AppCompatActivity {
         btnGuardar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                peliculaActual.setTitulo(etTitulo.getText().toString());
-                peliculaActual.setGenero(etGenero.getText().toString());
-                peliculaActual.setOpinion(etOpinion.getText().toString());
-                peliculaActual.setValoracion((int) rbValoracion.getRating());
-                peliculaActual.setEsPendiente(cbPendiente.isChecked());
-
-                db.peliculaDao().update(peliculaActual);
-                finish();
+                actualizarEnServidor(); // Actualizamos los datos en el servidor
             }
         });
 
@@ -158,6 +137,74 @@ public class EditarPeliculaActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 100);
             }
         }
+    }
+
+    private void cargarDatosServidor() {
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://34.136.199.32:81/peliculas.php?accion=por_id&idPeli=" + idPeli);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                if (conn.getResponseCode() == 200) {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder out = new StringBuilder();
+                    String line;
+                    while ((line = in.readLine()) != null) out.append(line);
+                    in.close();
+
+                    JSONObject obj = new JSONObject(out.toString());
+                    runOnUiThread(() -> {
+                        etTitulo.setText(obj.optString("titulo"));
+                        etGenero.setText(obj.optString("genero"));
+                        etOpinion.setText(obj.optString("opinion"));
+                        rbValoracion.setRating((float) obj.optDouble("valoracion"));
+                        cbPendiente.setChecked(obj.optInt("esPendiente") == 1);
+                        peliculaActual.setImagen(obj.optString("imagen"));
+
+                        peliculaActual.setAnno(obj.optString("anno"));      // Guardamos el año real
+                        peliculaActual.setEsFavorito(obj.optInt("esFavorito") == 1); // Guardamos favorito real
+
+                        // Lógica de imagen local
+                        if (!peliculaActual.getImagen().isEmpty()) {
+                            File imgFile = new File(peliculaActual.getImagen());
+                            if (imgFile.exists()) imagenPeli.setImageURI(Uri.fromFile(imgFile));
+                        }
+                    });
+                }
+            } catch (Exception e) { e.printStackTrace(); }
+        }).start();
+    }
+
+    private void actualizarEnServidor() {
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://34.136.199.32:81/peliculas.php?accion=actualizar");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setDoOutput(true);
+                conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+                String params = "id=" + idPeli +
+                        "&titulo=" + URLEncoder.encode(etTitulo.getText().toString(), "UTF-8") +
+                        "&genero=" + URLEncoder.encode(etGenero.getText().toString(), "UTF-8") +
+                        "&opinion=" + URLEncoder.encode(etOpinion.getText().toString(), "UTF-8") +
+                        "&valoracion=" + rbValoracion.getRating() +
+                        "&esPendiente=" + (cbPendiente.isChecked() ? 1 : 0) + // 1 si es True, 0 si es False
+                        "&esFavorito=" + (peliculaActual.isEsFavorito() ? 1 : 0) + // 1 si es True, 0 si es False
+                        "&anno=" + URLEncoder.encode(peliculaActual.getAnno(), "UTF-8") +
+                        "&imagen=" + URLEncoder.encode(peliculaActual.getImagen(), "UTF-8");
+
+                OutputStream os = conn.getOutputStream();
+                os.write(params.getBytes("UTF-8"));
+                os.close();
+
+                if (conn.getResponseCode() == 200) {
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, "Cambios guardados", Toast.LENGTH_SHORT).show();
+                        finish();
+                    });
+                }
+            } catch (Exception e) { e.printStackTrace(); }
+        }).start();
     }
 
     private void abrirGaleria() {
