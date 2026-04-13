@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         new Thread(() -> {
             try {
                 // Configuramos la URL para loguearnos
-                URL url = new URL("http://34.10.202.86:81/login.php");
+                URL url = new URL("http://34.175.247.221:81/login.php");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setDoOutput(true);

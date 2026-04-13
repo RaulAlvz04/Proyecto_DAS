@@ -91,7 +91,7 @@ public class DetallePeliculaActivity extends AppCompatActivity {
         new Thread(() -> {
             try {
                 // Usamos el siguiente endpoint para buscar la peli por el id
-                URL url = new URL("http://34.10.202.86:81/peliculas.php?accion=por_id&idPeli=" + idPeli);
+                URL url = new URL("http://34.175.247.221:81/peliculas.php?accion=por_id&idPeli=" + idPeli);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
                 if (conn.getResponseCode() == 200) {

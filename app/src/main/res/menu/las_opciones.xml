@@ -13,6 +13,10 @@
                 android:id="@+id/nav_pendientes"
                 android:icon="@android:drawable/ic_menu_recent_history"
                 android:title="@string/mis_pendientes_watchlist" />
+            <item
+                android:id="@+id/nav_mapa"
+                android:icon="@android:drawable/ic_menu_mylocation"
+                android:title="Mapa" />
         </menu>
     </item>
 

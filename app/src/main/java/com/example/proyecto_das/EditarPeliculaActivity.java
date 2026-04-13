@@ -177,7 +177,7 @@ public class EditarPeliculaActivity extends AppCompatActivity {
     private void actualizarEnServidor() {
         new Thread(() -> {
             try {
-                URL url = new URL("http://34.136.199.32:81/peliculas.php?accion=actualizar");
+                URL url = new URL("http://34.175.247.221:81/peliculas.php?accion=actualizar");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setDoOutput(true);
