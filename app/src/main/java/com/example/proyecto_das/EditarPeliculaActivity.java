@@ -142,7 +142,7 @@ public class EditarPeliculaActivity extends AppCompatActivity {
     private void cargarDatosServidor() {
         new Thread(() -> {
             try {
-                URL url = new URL("http://34.10.202.86:81/peliculas.php?accion=por_id&idPeli=" + idPeli);
+                URL url = new URL("http://34.175.109.59:81/peliculas.php?accion=por_id&idPeli=" + idPeli);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 if (conn.getResponseCode() == 200) {
                     BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -177,7 +177,7 @@ public class EditarPeliculaActivity extends AppCompatActivity {
     private void actualizarEnServidor() {
         new Thread(() -> {
             try {
-                URL url = new URL("http://34.175.247.221:81/peliculas.php?accion=actualizar");
+                URL url = new URL("http://34.175.109.59:81/peliculas.php?accion=actualizar");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setDoOutput(true);

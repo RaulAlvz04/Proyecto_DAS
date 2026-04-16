@@ -1,17 +1,24 @@
 package com.example.proyecto_das;
 
+import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -77,6 +84,127 @@ public class DetallePeliculaActivity extends AppCompatActivity {
                 startActivity(shareIntent);
             }
         });
+
+        Button btnAbrirDialogo = findViewById(R.id.btnAbrirDialogoAmigo);
+        btnAbrirDialogo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mostrarDialogoAmigo(null, null);
+            }
+        });
+
+        // Cargar la lista de amigos al iniciar
+        if (checkSelfPermission(android.Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{android.Manifest.permission.READ_CONTACTS, android.Manifest.permission.WRITE_CONTACTS}, 1);
+        } else {
+            actualizarListaAmigos();
+        }
+    }
+
+    private void mostrarDialogoAmigo(String nombre, String telefono) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        if (nombre == null) {
+            builder.setTitle("Nuevo amigo");
+        }
+        else {
+            builder.setTitle("Editar Teléfono");
+        }
+
+        // Layout del diálogo
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(40, 20, 40, 20);
+
+        EditText etNom = new EditText(this);
+        etNom.setHint("Nombre");
+        if (nombre != null) {
+            etNom.setText(nombre.replace("Cine - ", ""));
+            etNom.setEnabled(false); // Hacemos que no se pueda editar el nombre una vez puesto
+        }
+
+        EditText etTlf = new EditText(this);
+        etTlf.setHint("Teléfono");
+        etTlf.setInputType(android.text.InputType.TYPE_CLASS_PHONE);
+        if (telefono != null){
+            etTlf.setText(telefono);
+        }
+
+        layout.addView(etNom);
+        layout.addView(etTlf);
+        builder.setView(layout);
+
+        builder.setPositiveButton("Guardar", (dialog, which) -> {
+            if (nombre == null) {
+                // Si el nombre es null significa que no se ha creado todavia, así que llamamos a la función para añadirlo
+                añadirAmigoCine(etNom.getText().toString(), etTlf.getText().toString());
+            } else {
+                // Si no es null, llamamos a la función para que lo modifique.
+                modificarAmigoCine(nombre, etTlf.getText().toString());
+            }
+            actualizarListaAmigos(); // Refrescar lista
+        });
+
+        builder.setNegativeButton("Cancelar", null);
+        builder.show();
+    }
+
+    private void actualizarListaAmigos() {
+        // Limpiamos el contenedor para volver a pintarlo con los nuevos datos
+        LinearLayout contenedor = findViewById(R.id.contenedorAmigos);
+        contenedor.removeAllViews();
+
+
+        Uri uriPhones = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+        String[] columnas = new String[]{
+                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                ContactsContract.CommonDataKinds.Phone.NUMBER
+        };
+
+        Cursor c = getContentResolver().query(
+                uriPhones,
+                columnas,
+                ContactsContract.Data.DISPLAY_NAME + " LIKE ?",
+                new String[]{"Cine - %"},
+                null
+        );
+
+        if (c != null) {
+            while (c.moveToNext()) {
+                // Obtenemos por cada dato su nombre y el telefono
+                String nombre = c.getString(0);
+                String telefono = c.getString(1);
+
+                // Creamos fila, añadiendole el nombre y el botón de borrar
+                LinearLayout fila = new LinearLayout(this);
+
+                TextView tv = new TextView(this);
+                tv.setText("👤 " + nombre.replace("Cine - ", ""));
+                tv.setLayoutParams(new LinearLayout.LayoutParams(0, -2, 1f));
+                // Si se hace click en el nombre te deja editar el número de telefono por si lo has escirto mal
+                tv.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mostrarDialogoAmigo(nombre, telefono);
+                    }
+                });
+
+                Button btnBorrar = new Button(this);
+                btnBorrar.setText("Eliminar");
+                // Si se hace click en Eliminar, se borra el dato y se actualiza la lista para no mostrarlo
+                btnBorrar.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        eliminarAmigoCine(nombre);
+                        actualizarListaAmigos();
+                    }
+                });
+
+                fila.addView(tv);
+                fila.addView(btnBorrar);
+                contenedor.addView(fila);
+            }
+            c.close();
+        }
     }
 
     @Override
@@ -91,7 +219,7 @@ public class DetallePeliculaActivity extends AppCompatActivity {
         new Thread(() -> {
             try {
                 // Usamos el siguiente endpoint para buscar la peli por el id
-                URL url = new URL("http://34.175.247.221:81/peliculas.php?accion=por_id&idPeli=" + idPeli);
+                URL url = new URL("http://34.175.109.59:81/peliculas.php?accion=por_id&idPeli=" + idPeli);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
                 if (conn.getResponseCode() == 200) {
@@ -130,5 +258,53 @@ public class DetallePeliculaActivity extends AppCompatActivity {
         }).start();
     }
 
+    private void añadirAmigoCine(String nombre, String telefono) {
 
+        ContentValues values = new ContentValues();
+        Uri contactUri = getContentResolver().insert(ContactsContract.RawContacts.CONTENT_URI, values);
+        long contactId = android.content.ContentUris.parseId(contactUri);
+
+        ContentValues nameValues = new ContentValues();
+        nameValues.put(ContactsContract.Data.RAW_CONTACT_ID, contactId);
+        nameValues.put(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE);
+        nameValues.put(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, "Cine - " + nombre);
+        getContentResolver().insert(ContactsContract.Data.CONTENT_URI, nameValues);
+
+        ContentValues phoneValues = new ContentValues();
+        phoneValues.put(ContactsContract.Data.RAW_CONTACT_ID, contactId);
+        phoneValues.put(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
+        phoneValues.put(ContactsContract.CommonDataKinds.Phone.NUMBER, telefono);
+        phoneValues.put(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE);
+        getContentResolver().insert(ContactsContract.Data.CONTENT_URI, phoneValues);
+    }
+
+    private void modificarAmigoCine(String nombre, String telefono){
+
+        ContentValues cambios = new ContentValues();
+        cambios.put(ContactsContract.CommonDataKinds.Phone.NUMBER, telefono);
+
+        String cond = ContactsContract.Data.DISPLAY_NAME + " = ? AND " +
+                ContactsContract.Data.MIMETYPE + " = ?";
+        String[] args = { nombre, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE };
+
+        getContentResolver().update(ContactsContract.Data.CONTENT_URI, cambios, cond, args);
+    }
+
+    private void eliminarAmigoCine(String nombre) {
+        String cond = ContactsContract.Data.DISPLAY_NAME + " = ?";
+        String[] args = { nombre };
+
+        getContentResolver().delete(ContactsContract.RawContacts.CONTENT_URI, cond, args);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1 && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            // Una vez que el usuario acepta el permiso, cargamos la lista de amigos
+            actualizarListaAmigos();
+        } else {
+            Toast.makeText(this, "Permiso denegado para leer contactos", Toast.LENGTH_SHORT).show();
+        }
+    }
 }

@@ -65,7 +65,7 @@ public class PendientesActivity extends AppCompatActivity {
         new Thread(() -> {
             try {
                 // Usamos la acción 'pendientes' para obtener la lista de pelis pendientes de un usuario concreto
-                URL url = new URL("http://34.175.247.221:81/peliculas.php?accion=pendientes&idUsuario=" + idUsuarioLogueado);
+                URL url = new URL("http://34.175.109.59:81/peliculas.php?accion=pendientes&idUsuario=" + idUsuarioLogueado);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
                 if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
