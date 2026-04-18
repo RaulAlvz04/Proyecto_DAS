@@ -1,13 +1,18 @@
 package com.example.proyecto_das;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -39,7 +44,7 @@ public class DetallePeliculaActivity extends AppCompatActivity {
     RatingBar rbValoracion;
     ImageView ivDetalle;
     int idPeli;
-    Button btnEditar, btnCompartir;
+    Button btnEditar, btnCompartir, btnRecordatorio;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +95,63 @@ public class DetallePeliculaActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mostrarDialogoAmigo(null, null);
+            }
+        });
+
+        btnRecordatorio = findViewById(R.id.btnRecordatorio);
+        btnRecordatorio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(DetallePeliculaActivity.this);
+                builder.setTitle("Recordatorio de sesión");
+                builder.setMessage("¿Dentro de cuantos minutos quieres que se te avise?");
+
+                EditText etMins = new EditText(DetallePeliculaActivity.this);
+                etMins.setInputType(InputType.TYPE_CLASS_NUMBER);
+
+                LinearLayout container = new LinearLayout(DetallePeliculaActivity.this);
+                container.setPadding(60, 20, 60, 0);
+                container.setOrientation(LinearLayout.VERTICAL);
+                container.addView(etMins);
+
+                builder.setView(container);
+
+                builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String valor = etMins.getText().toString();
+
+                        if (!valor.isEmpty()){
+                            int mins = Integer.parseInt(valor);
+                            long minisecs = (long) mins * 60 * 1000;
+                            long momentoAlarma = System.currentTimeMillis() + minisecs;
+
+                            Intent intent = new Intent(DetallePeliculaActivity.this, AlarmReceiver.class);
+                            intent.putExtra("TITULO_PELI", tvTitulo.getText().toString());
+
+                            PendingIntent pIntent = PendingIntent.getBroadcast(DetallePeliculaActivity.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+                            AlarmManager gestor = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                            if (gestor != null) {
+                                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                                    if (gestor.canScheduleExactAlarms()) {
+                                        gestor.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, momentoAlarma, pIntent);
+                                        Toast.makeText(DetallePeliculaActivity.this, "Aviso programado", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(DetallePeliculaActivity.this,"No tienes permiso para alarmas exactas", Toast.LENGTH_LONG).show();
+                                    }
+                                } else {
+                                    gestor.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, momentoAlarma, pIntent);
+                                    Toast.makeText(DetallePeliculaActivity.this, "Aviso programado", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                        }
+                    }
+                });
+
+                builder.setNegativeButton("Cancelar", null);
+                builder.show();
             }
         });
 
@@ -219,7 +281,7 @@ public class DetallePeliculaActivity extends AppCompatActivity {
         new Thread(() -> {
             try {
                 // Usamos el siguiente endpoint para buscar la peli por el id
-                URL url = new URL("http://34.175.109.59:81/peliculas.php?accion=por_id&idPeli=" + idPeli);
+                URL url = new URL("http://34.175.102.229:81/peliculas.php?accion=por_id&idPeli=" + idPeli);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
                 if (conn.getResponseCode() == 200) {

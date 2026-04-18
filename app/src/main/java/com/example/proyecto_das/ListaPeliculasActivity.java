@@ -207,7 +207,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
         new Thread(() -> {
             try {
                 // Usamos este endpoint para obtener todas la películas de un usuario o solo las favoritas desde el servidor
-                URL url = new URL("http://34.175.109.59:81/peliculas.php?accion=" + accion + "&idUsuario=" + idUsuarioLogueado);
+                URL url = new URL("http://34.175.102.229:81/peliculas.php?accion=" + accion + "&idUsuario=" + idUsuarioLogueado);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
                 if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
@@ -261,7 +261,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
         new Thread(() -> {
             try {
                 // Usamos el siguiente endpoint para añadir la peli a la base de datos remota
-                URL url = new URL("http://34.175.109.59:81/peliculas.php?accion=insertar");
+                URL url = new URL("http://34.175.102.229:81/peliculas.php?accion=insertar");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setDoOutput(true);
@@ -293,7 +293,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
         new Thread(() -> {
             try {
                 // Usamos este endpoint para eliminar la peli y borrarla de la base de datos remota
-                URL url = new URL("http://34.175.109.59:81/peliculas.php?accion=eliminar");
+                URL url = new URL("http://34.175.102.229:81/peliculas.php?accion=eliminar");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setDoOutput(true);
@@ -322,7 +322,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
 
         new Thread(() -> {
             try {
-                URL url = new URL("http://34.175.109.59:81/peliculas.php?accion=actualizar");
+                URL url = new URL("http://34.175.102.229:81/peliculas.php?accion=actualizar");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setDoOutput(true);
@@ -462,7 +462,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
                 String fotoen64 = Base64.encodeToString(fototransformada, Base64.DEFAULT);
 
                 // Conectarnos al servidor
-                URL url = new URL("http://34.175.109.59:81/subirImagenPerfil.php");
+                URL url = new URL("http://34.175.102.229:81/subirImagenPerfil.php");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setDoOutput(true);
@@ -491,7 +491,7 @@ public class ListaPeliculasActivity extends AppCompatActivity implements DialogA
         new Thread(() -> {
             try {
                 // La dirección apunta al archivo .jpg correspondiente a la foto de el usuario logueado
-                String direccion = "http://34.175.109.59:81/imagenesPerfil/user_" + idUsuarioLogueado + ".jpg";
+                String direccion = "http://34.175.102.229:81/imagenesPerfil/user_" + idUsuarioLogueado + ".jpg";
                 URL destino = new URL(direccion);
 
                 HttpURLConnection conn = (HttpURLConnection) destino.openConnection();
