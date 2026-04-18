@@ -18,12 +18,20 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 
 public class MapaActivity extends AppCompatActivity {
 
@@ -79,12 +87,54 @@ public class MapaActivity extends AppCompatActivity {
                     miMarcador.setTitle(getString(R.string.mi_ubi));
                     map.getOverlays().add(miMarcador);
 
+                    buscarCinesCercanos(miPosicion);
+
                     map.invalidate(); // Refrescar el mapa para que aparezca el marcador
                 } else {
                     Toast.makeText(MapaActivity.this, "No se pudo obtener la ubicación. ¿Tienes el GPS activo?", Toast.LENGTH_LONG).show();
                 }
             }
         });
+    }
+
+    private void buscarCinesCercanos(GeoPoint centro) {
+        new Thread(() -> {
+            try {
+                String query = "[out:json];node[\"amenity\"=\"cinema\"](around:5000," + centro.getLatitude() + "," + centro.getLongitude() + ");out;";
+                String urlStr = "https://overpass-api.de/api/interpreter?data=" + URLEncoder.encode(query, "UTF-8");
+
+                HttpURLConnection conn = (HttpURLConnection) new URL(urlStr).openConnection();
+                conn.setRequestProperty("User-Agent", "Mozilla/5.0");
+
+                int codigo = conn.getResponseCode();
+                android.util.Log.d("OVERPASS", "Código respuesta: " + codigo);
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+                reader.close();
+
+                JSONArray elementos = new JSONObject(sb.toString()).getJSONArray("elements");
+
+                runOnUiThread(() -> {
+                    for (int i = 0; i < elementos.length(); i++) {
+                        try {
+                            JSONObject cine = elementos.getJSONObject(i);
+                            Marker m = new Marker(map);
+                            m.setPosition(new GeoPoint(cine.getDouble("lat"), cine.getDouble("lon")));
+                            map.getOverlays().add(m);
+                        } catch (Exception e) { e.printStackTrace(); }
+                    }
+                    map.invalidate();
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     @Override
