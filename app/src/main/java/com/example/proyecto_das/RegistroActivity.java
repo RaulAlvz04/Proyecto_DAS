@@ -72,7 +72,7 @@ public class RegistroActivity extends AppCompatActivity {
             public void run() {
                 try {
                     // Configurar conexión para registrarnos
-                    URL url = new URL("http://34.175.102.229:81/registro.php");
+                    URL url = new URL("http://34.175.144.158:81/registro.php");
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestMethod("POST");
                     conn.setDoOutput(true);
@@ -121,7 +121,6 @@ public class RegistroActivity extends AppCompatActivity {
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    runOnUiThread(() -> Toast.makeText(RegistroActivity.this, "Error de red", Toast.LENGTH_SHORT).show());
                 }
             }
         }).start();

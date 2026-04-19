@@ -103,8 +103,8 @@ public class DetallePeliculaActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(DetallePeliculaActivity.this);
-                builder.setTitle("Recordatorio de sesión");
-                builder.setMessage("¿Dentro de cuantos minutos quieres que se te avise?");
+                builder.setTitle(R.string.recordatorioSesion);
+                builder.setMessage(R.string.mensajeRecordatorio);
 
                 EditText etMins = new EditText(DetallePeliculaActivity.this);
                 etMins.setInputType(InputType.TYPE_CLASS_NUMBER);
@@ -116,7 +116,7 @@ public class DetallePeliculaActivity extends AppCompatActivity {
 
                 builder.setView(container);
 
-                builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(R.string.aceptar, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String valor = etMins.getText().toString();
@@ -136,13 +136,13 @@ public class DetallePeliculaActivity extends AppCompatActivity {
                                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
                                     if (gestor.canScheduleExactAlarms()) {
                                         gestor.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, momentoAlarma, pIntent);
-                                        Toast.makeText(DetallePeliculaActivity.this, "Aviso programado", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(DetallePeliculaActivity.this, R.string.avisoProgram, Toast.LENGTH_SHORT).show();
                                     } else {
-                                        Toast.makeText(DetallePeliculaActivity.this,"No tienes permiso para alarmas exactas", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(DetallePeliculaActivity.this,R.string.avisoExacto, Toast.LENGTH_LONG).show();
                                     }
                                 } else {
                                     gestor.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, momentoAlarma, pIntent);
-                                    Toast.makeText(DetallePeliculaActivity.this, "Aviso programado", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(DetallePeliculaActivity.this, R.string.avisoProgram, Toast.LENGTH_SHORT).show();
                                 }
                             }
 
@@ -150,7 +150,7 @@ public class DetallePeliculaActivity extends AppCompatActivity {
                     }
                 });
 
-                builder.setNegativeButton("Cancelar", null);
+                builder.setNegativeButton(R.string.cancelar, null);
                 builder.show();
             }
         });
@@ -166,10 +166,10 @@ public class DetallePeliculaActivity extends AppCompatActivity {
     private void mostrarDialogoAmigo(String nombre, String telefono) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         if (nombre == null) {
-            builder.setTitle("Nuevo amigo");
+            builder.setTitle(R.string.nuevoAmigo);
         }
         else {
-            builder.setTitle("Editar Teléfono");
+            builder.setTitle(R.string.editarTelefono);
         }
 
         // Layout del diálogo
@@ -178,14 +178,14 @@ public class DetallePeliculaActivity extends AppCompatActivity {
         layout.setPadding(40, 20, 40, 20);
 
         EditText etNom = new EditText(this);
-        etNom.setHint("Nombre");
+        etNom.setHint(R.string.nombre);
         if (nombre != null) {
             etNom.setText(nombre.replace("Cine - ", ""));
             etNom.setEnabled(false); // Hacemos que no se pueda editar el nombre una vez puesto
         }
 
         EditText etTlf = new EditText(this);
-        etTlf.setHint("Teléfono");
+        etTlf.setHint(R.string.telefono);
         etTlf.setInputType(android.text.InputType.TYPE_CLASS_PHONE);
         if (telefono != null){
             etTlf.setText(telefono);
@@ -195,7 +195,7 @@ public class DetallePeliculaActivity extends AppCompatActivity {
         layout.addView(etTlf);
         builder.setView(layout);
 
-        builder.setPositiveButton("Guardar", (dialog, which) -> {
+        builder.setPositiveButton(R.string.guardar, (dialog, which) -> {
             if (nombre == null) {
                 // Si el nombre es null significa que no se ha creado todavia, así que llamamos a la función para añadirlo
                 añadirAmigoCine(etNom.getText().toString(), etTlf.getText().toString());
@@ -206,7 +206,7 @@ public class DetallePeliculaActivity extends AppCompatActivity {
             actualizarListaAmigos(); // Refrescar lista
         });
 
-        builder.setNegativeButton("Cancelar", null);
+        builder.setNegativeButton(R.string.cancelar, null);
         builder.show();
     }
 
@@ -251,7 +251,7 @@ public class DetallePeliculaActivity extends AppCompatActivity {
                 });
 
                 Button btnBorrar = new Button(this);
-                btnBorrar.setText("Eliminar");
+                btnBorrar.setText(R.string.btn_eliminar);
                 // Si se hace click en Eliminar, se borra el dato y se actualiza la lista para no mostrarlo
                 btnBorrar.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -281,7 +281,7 @@ public class DetallePeliculaActivity extends AppCompatActivity {
         new Thread(() -> {
             try {
                 // Usamos el siguiente endpoint para buscar la peli por el id
-                URL url = new URL("http://34.175.102.229:81/peliculas.php?accion=por_id&idPeli=" + idPeli);
+                URL url = new URL("http://34.175.144.158:81/peliculas.php?accion=por_id&idPeli=" + idPeli);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
                 if (conn.getResponseCode() == 200) {
@@ -297,7 +297,12 @@ public class DetallePeliculaActivity extends AppCompatActivity {
                     runOnUiThread(() -> {
                         tvTitulo.setText(obj.optString("titulo"));
                         tvGenero.setText(obj.optString("genero"));
-                        tvOpinion.setText(obj.optString("opinion", ""));
+                        String opinion = obj.optString("opinion", "");
+                        if (!opinion.equals("null")) {
+                            tvOpinion.setText(opinion);
+                        } else {
+                            tvOpinion.setText("");
+                        }
                         rbValoracion.setRating((float) obj.optDouble("valoracion", 0));
 
                         if (obj.optInt("esPendiente") == 1) {
@@ -315,7 +320,7 @@ public class DetallePeliculaActivity extends AppCompatActivity {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                runOnUiThread(() -> Toast.makeText(this, "Error al cargar detalle", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(this, R.string.errorDetalle, Toast.LENGTH_SHORT).show());
             }
         }).start();
     }
@@ -366,7 +371,7 @@ public class DetallePeliculaActivity extends AppCompatActivity {
             // Una vez que el usuario acepta el permiso, cargamos la lista de amigos
             actualizarListaAmigos();
         } else {
-            Toast.makeText(this, "Permiso denegado para leer contactos", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.permisoNo, Toast.LENGTH_SHORT).show();
         }
     }
 }

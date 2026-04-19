@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         new Thread(() -> {
             try {
                 // Configuramos la URL para loguearnos
-                URL url = new URL("http://34.175.102.229:81/login.php");
+                URL url = new URL("http://34.175.144.158:81/login.php");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setDoOutput(true);
@@ -133,7 +133,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Error de red: " + e.getMessage(), Toast.LENGTH_SHORT).show());
             }
         }).start();
     }

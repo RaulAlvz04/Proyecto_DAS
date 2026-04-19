@@ -67,5 +67,25 @@
     <string name="mensajeRecuerdo" >Oraindik ikusteko dituzu film batzuk</string>
     <string name="entendido">Ulertuta</string>
     <string name="hacer_foto">Irudi bat sakatu</string>
-    <string name="mi_ubi">Mi ubicación</string>
+    <string name="mi_ubi">Nire Kokapena</string>
+    <string name="recordatorioPeli">Film Gogoraketa</string>
+    <string name="recordatorioPeliMensaje">"Ikusi orain "</string>
+    <string name="aceptar">Onartu</string>
+    <string name="recordatorioSesion">Sesio Gogoraketa</string>
+    <string name="mensajeRecordatorio">Zenbat minutu barru abisatzea nahi duzu</string>
+    <string name="avisoProgram">Oharra programatuta</string>
+    <string name="avisoExacto">"Ezin duzu ohar zehatzak ipini "</string>
+    <string name="nuevoAmigo">Lagun Berria</string>
+    <string name="editarTelefono">Telefonoa Aldatu</string>
+    <string name="nombre">Izena</string>
+    <string name="telefono">Telefonoa</string>
+    <string name="guardar">Babestu</string>
+    <string name="errorDetalle">Akatsa xehetasuna kargatzean</string>
+    <string name="permisoNo">Baimena ukatuta</string>
+    <string name="cambiosGuardados">Aldaketak babestuta</string>
+    <string name="camaraPermiso">Kamara baimena beharrezkoa</string>
+    <string name="noUbicacion">Ezin zen kokapena hartu</string>
+    <string name="btnRecordatorio">Gogoraketa Ipini</string>
+    <string name="amigos_de_cine">Zinemako Lagunak</string>
+    <string name="mapa">Mapa</string>
 </resources>

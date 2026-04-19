@@ -142,7 +142,7 @@ public class EditarPeliculaActivity extends AppCompatActivity {
     private void cargarDatosServidor() {
         new Thread(() -> {
             try {
-                URL url = new URL("http://34.175.102.229:81/peliculas.php?accion=por_id&idPeli=" + idPeli);
+                URL url = new URL("http://34.175.144.158:81/peliculas.php?accion=por_id&idPeli=" + idPeli);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 if (conn.getResponseCode() == 200) {
                     BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -177,7 +177,7 @@ public class EditarPeliculaActivity extends AppCompatActivity {
     private void actualizarEnServidor() {
         new Thread(() -> {
             try {
-                URL url = new URL("http://34.175.102.229:81/peliculas.php?accion=actualizar");
+                URL url = new URL("http://34.175.144.158:81/peliculas.php?accion=actualizar");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setDoOutput(true);
@@ -199,7 +199,7 @@ public class EditarPeliculaActivity extends AppCompatActivity {
 
                 if (conn.getResponseCode() == 200) {
                     runOnUiThread(() -> {
-                        Toast.makeText(this, "Cambios guardados", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.cambiosGuardados, Toast.LENGTH_SHORT).show();
                         finish();
                     });
                 }

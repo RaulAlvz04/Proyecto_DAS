@@ -67,4 +67,24 @@
     <string name="entendido">Entendido</string>
     <string name="hacer_foto">Hacer Foto</string>
     <string name="mi_ubi">Mi ubicación</string>
+    <string name="recordatorioPeli">Recordatorio de Pelicula</string>
+    <string name="recordatorioPeliMensaje">"¡Hora de ver "</string>
+    <string name="aceptar">Aceptar</string>
+    <string name="recordatorioSesion">Recordatorio de sesión</string>
+    <string name="mensajeRecordatorio">¿Dentro de cuantos minutos quieres que se te avise?</string>
+    <string name="avisoProgram">Aviso programado</string>
+    <string name="avisoExacto">No tienes permiso para alarmas exactas</string>
+    <string name="nuevoAmigo">Nuevo amigo</string>
+    <string name="editarTelefono">Editar Teléfono</string>
+    <string name="nombre">Nombre</string>
+    <string name="telefono">Teléfono</string>
+    <string name="guardar">Guardar</string>
+    <string name="errorDetalle">Error al cargar detalle</string>
+    <string name="permisoNo">Permiso denegado para leer contactos</string>
+    <string name="cambiosGuardados">Cambios guardados</string>
+    <string name="camaraPermiso">Permiso de cámara necesario</string>
+    <string name="noUbicacion">No se pudo obtener la ubicación</string>
+    <string name="btnRecordatorio">Poner Recordatorio</string>
+    <string name="amigos_de_cine">Amigos de cine</string>
+    <string name="mapa">Mapa</string>
 </resources>
