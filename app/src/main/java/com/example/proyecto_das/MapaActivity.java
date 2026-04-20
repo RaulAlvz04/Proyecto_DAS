@@ -36,6 +36,7 @@ import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class MapaActivity extends AppCompatActivity {
@@ -106,17 +107,21 @@ public class MapaActivity extends AppCompatActivity {
         new Thread(() -> {
             try {
                 String query = "[out:json];node[\"amenity\"=\"cinema\"](around:5000," + centro.getLatitude() + "," + centro.getLongitude() + ");out;";
-                String urlStr = "https://overpass-api.de/api/interpreter?data=" + java.net.URLEncoder.encode(query, "UTF-8");
+                String url = "https://overpass-api.de/api/interpreter";
 
                 OkHttpClient client = new OkHttpClient.Builder()
                         .connectTimeout(30, TimeUnit.SECONDS)
                         .readTimeout(30, TimeUnit.SECONDS)
                         .build();
 
+                RequestBody body = new okhttp3.FormBody.Builder()
+                        .add("data", query)
+                        .build();
+
                 Request request = new Request.Builder()
-                        .url(urlStr)
-                        .header("Accept", "application/json")
-                        .header("User-Agent", "Mozilla/5.0")
+                        .url(url)
+                        .post(body)
+                        .header("User-Agent", "ProyectoCineDAS")
                         .build();
 
                 Response response = client.newCall(request).execute();
